@@ -8,8 +8,18 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import "./app.css";
+import {
+	isColorDark,
+	isRGB,
+	retrieveLaunchParams,
+} from "@telegram-apps/sdk-react";
 import { TRPCReactProvider } from "~/trpc/client";
 import { Toaster } from "./components/ui/sonner";
+import { init } from "./lib/init";
+import "./lib/mock-env";
+import { useEffect, useState } from "react";
+import { EnvUnsupported } from "./components/unsupported-env";
+import logo from "~/assets/logo.png";
 
 // export async function loader({ request }: Route.LoaderArgs) {
 // 	const { getTheme } = await themeSessionResolver(request);
@@ -18,8 +28,116 @@ import { Toaster } from "./components/ui/sonner";
 // 	};
 // }
 
-export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
-	const _data = loaderData;
+export const links: Route.LinksFunction = () => {
+	return [
+		{
+			rel: "icon",
+			href: "/favicon.png",
+			type: "image/png",
+		},
+	];
+};
+
+export default function AppWithProviders() {
+	const [telegramData, setTelegramData] = useState<{
+		platform: string;
+		isDark: boolean;
+		launchParamsError: Error | null;
+	}>({
+		platform: "android",
+		isDark: false,
+		launchParamsError: null,
+	});
+
+	const [isInitialized, setIsInitialized] = useState(false);
+
+	useEffect(() => {
+		// Only run on client side
+		if (typeof window !== "undefined") {
+			try {
+				const lp = retrieveLaunchParams();
+				const { bg_color: bgColor } = lp.tgWebAppThemeParams;
+				setTelegramData({
+					platform: lp.tgWebAppPlatform,
+					isDark: bgColor && isRGB(bgColor) ? isColorDark(bgColor) : false,
+					launchParamsError: null,
+				});
+			} catch (e) {
+				setTelegramData({
+					platform: "android",
+					isDark: false,
+					launchParamsError: e as Error,
+				});
+			}
+			setIsInitialized(true);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (
+			typeof window !== "undefined" &&
+			!telegramData.launchParamsError &&
+			isInitialized
+		) {
+			const initializeApp = async () => {
+				try {
+					const lp = retrieveLaunchParams();
+					const debug =
+						(lp.tgWebAppStartParam || "").includes("platformer_debug") ||
+						import.meta.env.DEV;
+					await init({
+						debug,
+						eruda: debug && ["ios", "android"].includes(telegramData.platform),
+						mockForMacOS: telegramData.platform === "macos",
+					});
+				} catch (e) {
+					console.error("Error initializing app:", e);
+				}
+			};
+			initializeApp();
+		}
+	}, [telegramData.platform, telegramData.launchParamsError, isInitialized]);
+
+	// Show loading state during SSR or before initialization
+	if (typeof window === "undefined" || !isInitialized) {
+		return (
+			<html lang="en">
+				<head>
+					<meta charSet="utf-8" />
+					<meta name="viewport" content="width=device-width, initial-scale=1" />
+					<Meta />
+					<Links />
+					<title>Loading...</title>
+				</head>
+				<body className="bg-background text-foreground">
+					<div className="flex items-center justify-center min-h-screen">
+						<img
+							src={logo}
+							alt="Logo"
+							className="size-24 rounded-full animate-spin"
+						/>
+					</div>
+					<ScrollRestoration />
+					<Scripts />
+				</body>
+			</html>
+		);
+	}
+
+	if (telegramData.launchParamsError) {
+		console.error("Launch params error:", telegramData.launchParamsError);
+		return (
+			<html lang="en">
+				<head>
+					<title>Error</title>
+				</head>
+				<body>
+					<EnvUnsupported />
+				</body>
+			</html>
+		);
+	}
+
 	return (
 		<TRPCReactProvider>
 			<App />

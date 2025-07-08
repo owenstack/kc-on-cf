@@ -16,6 +16,9 @@ export const user = sqliteTable("user", {
 	walletKitConnected: integer("wallet_kit_connected", {
 		mode: "boolean",
 	}).default(false),
+	isOnboarded: integer("is_onboarded", { mode: "boolean" })
+		.default(false)
+		.notNull(),
 	referrerId: integer("referrer_id"),
 	banned: integer("banned", { mode: "boolean" }).default(false).notNull(),
 	banReason: text("ban_reason"),
