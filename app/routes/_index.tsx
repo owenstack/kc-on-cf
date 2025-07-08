@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/trpc/client";
 import { toast } from "sonner";
 import { Skeleton } from "~/components/ui/skeleton";
+import { useTRPC } from "~/trpc/client";
 
 export default function Index() {
 	const trpc = useTRPC();

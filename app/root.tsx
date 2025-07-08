@@ -17,9 +17,10 @@ import { TRPCReactProvider } from "~/trpc/client";
 import { Toaster } from "./components/ui/sonner";
 import { init } from "./lib/init";
 import "./lib/mock-env";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useEffect, useState } from "react";
-import { EnvUnsupported } from "./components/unsupported-env";
 import logo from "~/assets/logo.png";
+import { EnvUnsupported } from "./components/unsupported-env";
 
 // export async function loader({ request }: Route.LoaderArgs) {
 // 	const { getTheme } = await themeSessionResolver(request);
@@ -111,11 +112,14 @@ export default function AppWithProviders() {
 				</head>
 				<body className="bg-background text-foreground">
 					<div className="flex items-center justify-center min-h-screen">
-						<img
-							src={logo}
-							alt="Logo"
-							className="size-24 rounded-full animate-spin"
-						/>
+						<div className="flex flex-col items-center space-y-4">
+							<img
+								src={logo}
+								alt="Logo"
+								className="size-24 rounded-full animate-spin"
+							/>
+							<p className="text-lg">Connecting to server...</p>
+						</div>
 					</div>
 					<ScrollRestoration />
 					<Scripts />
@@ -160,6 +164,7 @@ export function App() {
 			<body className="bg-background text-foreground">
 				<Outlet />
 				<Toaster richColors />
+				<ReactQueryDevtools buttonPosition="bottom-left" />
 				<ScrollRestoration />
 				<Scripts />
 			</body>

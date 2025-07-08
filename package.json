@@ -31,6 +31,7 @@
 		"better-sqlite3": "^11.9.1",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"connectkit": "^1.9.1",
 		"drizzle-orm": "^0.43.1",
 		"eruda": "^3.4.3",
 		"isbot": "^5.1.27",
@@ -43,7 +44,9 @@
 		"sonner": "^2.0.3",
 		"superjson": "^2.2.2",
 		"tailwind-merge": "^3.2.0",
-		"vaul": "^1.1.2"
+		"vaul": "^1.1.2",
+		"viem": "^2.31.7",
+		"wagmi": "^2.15.6"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.6",
