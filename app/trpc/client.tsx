@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { retrieveRawInitData } from "@telegram-apps/sdk-react";
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
@@ -14,7 +15,7 @@ function makeQueryClient() {
 		},
 	});
 }
-let browserQueryClient: QueryClient | undefined = undefined;
+let browserQueryClient: QueryClient | undefined;
 
 function getQueryClient() {
 	if (typeof window === "undefined") {
@@ -47,7 +48,8 @@ const links = [
 		url: getBaseUrl() ? `${getBaseUrl()}/api/trpc` : "/api/trpc",
 		headers() {
 			const headers = new Headers();
-			headers.set("x-trpc-source", "react");
+			const initData = retrieveRawInitData();
+			headers.set("Authorization", `tma ${initData}`);
 			return headers;
 		},
 	}),

@@ -14,8 +14,8 @@
 	"d1_databases": [
 		{
 			"binding": "DATABASE",
-			"database_name": "yat",
-			"database_id": "a94dc341-42e3-4b07-8d5c-c580f3a82794"
+			"database_name": "kc-mev-db",
+			"database_id": "055bf134-6c89-451d-ac1e-a8d0b2590c1a"
 		}
 	]
 	/**

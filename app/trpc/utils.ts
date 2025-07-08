@@ -1,15 +1,105 @@
-import { TRPCError, initTRPC } from "@trpc/server";
+import { env } from "cloudflare:workers";
+import {
+	AuthDateInvalidError,
+	ExpiredError,
+	parse,
+	SignatureInvalidError,
+	SignatureMissingError,
+	validate,
+} from "@telegram-apps/init-data-node";
+import { initTRPC, TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import type { LoaderFunctionArgs } from "react-router";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "~/db";
-import { auth } from "~/lib/auth";
+import { user } from "~/db/schema";
 
 export async function createContext({ headers }: { headers: Headers }) {
-	const authz = await auth.api.getSession({ headers: headers });
-	const source = headers.get("x-trpc-source") ?? "unknown";
-	console.log(">>> tRPC Request from", source, "by", authz?.user.email);
-	return { user: authz?.user, db };
+	try {
+		const authHeader = headers.get("Authorization") ?? "";
+		const [authType, authData = ""] = authHeader.split(" ");
+		if (authType !== "tma") {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Invalid authentication type",
+			});
+		}
+		if (!import.meta.env) {
+			validate(authData, env.BOT_TOKEN, {
+				expiresIn: 3600,
+			});
+		}
+		const initData = parse(authData);
+		if (!initData || !initData.user) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Invalid authentication data",
+			});
+		}
+		const existingUser = await db.query.user.findFirst({
+			where: eq(user.telegramId, initData.user.id),
+		});
+		if (existingUser) {
+			const updatedUser = await db
+				.update(user)
+				.set({
+					firstName: initData.user.first_name,
+					lastName: initData.user.last_name,
+					username: initData.user.username,
+					image: initData.user.photo_url ?? null,
+					updatedAt: new Date(),
+				})
+				.where(eq(user.id, existingUser.id))
+				.returning();
+			return { user: updatedUser[0], db };
+		}
+		const newUser = await db
+			.insert(user)
+			.values({
+				telegramId: initData.user.id,
+				firstName: initData.user.first_name,
+				lastName: initData.user.last_name || null,
+				username: initData.user.username || null,
+				image: initData.user.photo_url || null,
+				role: "user",
+				balance: 0,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.returning();
+
+		return { user: newUser[0], db };
+	} catch (error) {
+		if (error instanceof ExpiredError) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Authentication data has expired",
+			});
+		}
+		if (error instanceof AuthDateInvalidError) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Invalid auth date in authentication data",
+			});
+		}
+		if (error instanceof SignatureInvalidError) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Invalid signature in authentication data",
+			});
+		}
+		if (error instanceof SignatureMissingError) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Signature is missing in authentication data",
+			});
+		}
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: error instanceof Error ? error.message : "Unknown error",
+		});
+	}
 }
 export type Context = Awaited<ReturnType<typeof createContext>>;
 
