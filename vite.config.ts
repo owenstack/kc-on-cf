@@ -19,4 +19,7 @@ export default defineConfig({
 			external: ["cloudflare:workers"],
 		},
 	},
+	server: {
+		allowedHosts: [".ngrok-free.app"],
+	},
 });

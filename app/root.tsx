@@ -20,6 +20,7 @@ import "./lib/mock-env";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useEffect, useState } from "react";
 import logo from "~/assets/logo.png";
+import { Header } from "./components/header";
 import { EnvUnsupported } from "./components/unsupported-env";
 
 // export async function loader({ request }: Route.LoaderArgs) {
@@ -39,7 +40,16 @@ export const links: Route.LinksFunction = () => {
 	];
 };
 
-export default function AppWithProviders() {
+export const loader = async ({ context }: Route.LoaderArgs) => {
+	const { env } = context.cloudflare;
+	return {
+		alchemyKey: env.VITE_ALCHEMY_API_KEY,
+		familyId: env.VITE_FAMILY_PROJECT_ID,
+	};
+};
+
+export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
+	const { alchemyKey, familyId } = loaderData;
 	const [telegramData, setTelegramData] = useState<{
 		platform: string;
 		isDark: boolean;
@@ -112,7 +122,7 @@ export default function AppWithProviders() {
 				</head>
 				<body className="bg-background text-foreground">
 					<div className="flex items-center justify-center min-h-screen">
-						<div className="flex flex-col items-center space-y-4">
+						<div className="flex flex-col items-center space-y-4 animate-out">
 							<img
 								src={logo}
 								alt="Logo"
@@ -143,7 +153,7 @@ export default function AppWithProviders() {
 	}
 
 	return (
-		<TRPCReactProvider>
+		<TRPCReactProvider familyId={familyId} alchemyKey={alchemyKey}>
 			<App />
 		</TRPCReactProvider>
 	);
@@ -162,6 +172,7 @@ export function App() {
 				<Links />
 			</head>
 			<body className="bg-background text-foreground">
+				<Header />
 				<Outlet />
 				<Toaster richColors />
 				<ReactQueryDevtools buttonPosition="bottom-left" />

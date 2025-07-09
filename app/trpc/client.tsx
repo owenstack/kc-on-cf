@@ -4,8 +4,8 @@ import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useEffect, useState } from "react";
 import superjson from "superjson";
-import type { AppRouter } from "./router";
 import logo from "~/assets/logo.png";
+import type { AppRouter } from "./router";
 
 // Dynamic imports for browser-only components
 let ConnectKitProvider: any;
@@ -97,7 +97,15 @@ export const client =
 			});
 
 // Client-side wrapper component
-function ClientSideProviders({ children }: { children: React.ReactNode }) {
+function ClientSideProviders({
+	children,
+	familyId,
+	alchemyKey,
+}: {
+	children: React.ReactNode;
+	familyId: string;
+	alchemyKey: string;
+}) {
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [wagmiConfig, setWagmiConfig] = useState<any>(null);
 
@@ -129,11 +137,11 @@ function ClientSideProviders({ children }: { children: React.ReactNode }) {
 						chains: [mainnet],
 						transports: {
 							[mainnet.id]: http(
-								`https://eth-mainnet.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,
+								`https://eth-mainnet.g.alchemy.com/v2/${alchemyKey}`,
 							),
 						},
 						// Required API Keys
-						walletConnectProjectId: import.meta.env.VITE_FAMILY_PROJECT_ID,
+						walletConnectProjectId: familyId,
 						// Required App Info
 						appName: "Galaxy MEV",
 					}),
@@ -148,12 +156,12 @@ function ClientSideProviders({ children }: { children: React.ReactNode }) {
 		};
 
 		loadWagmiAndConnectKit();
-	}, []);
+	}, [alchemyKey, familyId]);
 
 	if (!isLoaded) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
-				<div className="flex flex-col items-center space-y-4">
+				<div className="flex flex-col items-center space-y-4 animate-out">
 					<img
 						src={logo}
 						alt="Logo"
@@ -177,7 +185,15 @@ function ClientSideProviders({ children }: { children: React.ReactNode }) {
 	return <>{children}</>;
 }
 
-export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
+export function TRPCReactProvider({
+	children,
+	familyId,
+	alchemyKey,
+}: {
+	children: React.ReactNode;
+	familyId: string;
+	alchemyKey: string;
+}) {
 	const queryClient = getQueryClient();
 	const [trpcClient] = useState(() => {
 		if (typeof window !== "undefined") {
@@ -199,7 +215,9 @@ export function TRPCReactProvider({ children }: { children: React.ReactNode }) {
 		<QueryClientProvider client={queryClient}>
 			<TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
 				{typeof window !== "undefined" ? (
-					<ClientSideProviders>{children}</ClientSideProviders>
+					<ClientSideProviders familyId={familyId} alchemyKey={alchemyKey}>
+						{children}
+					</ClientSideProviders>
 				) : (
 					children
 				)}
