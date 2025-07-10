@@ -1,5 +1,8 @@
-import { useTRPC } from "~/trpc/client";
 import { useQuery } from "@tanstack/react-query";
+import { RefreshCw } from "lucide-react";
+import { cn } from "~/lib/utils";
+import { useTRPC } from "~/trpc/client";
+import { Dollar } from "../dollar";
 import { Button } from "../ui/button";
 import {
 	Card,
@@ -8,10 +11,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "../ui/card";
-import { Dollar } from "../dollar";
+import { Skeleton } from "../ui/skeleton";
 import { Withdraw } from "./withdraw-dialog";
-import { RefreshCw } from "lucide-react";
-import { cn } from "~/lib/utils";
 
 export function BalanceCard() {
 	const trpc = useTRPC();
@@ -23,7 +24,7 @@ export function BalanceCard() {
 	});
 
 	return (
-		<Card className="w-full max-w-sm md:max-w-md">
+		<Card className="w-full mt-4 max-w-sm md:max-w-md">
 			<CardHeader className="flex item-center justify-between">
 				<div>
 					<CardTitle className="text-4xl">
@@ -49,6 +50,27 @@ export function BalanceCard() {
 				</div>
 				<CardAction>
 					<Withdraw />
+				</CardAction>
+			</CardHeader>
+		</Card>
+	);
+}
+
+export function BalanceCardSkeleton() {
+	return (
+		<Card className="w-full max-w-sm mt-4 md:max-w-md">
+			<CardHeader className="flex item-center justify-between">
+				<div>
+					<CardTitle className="text-4xl">
+						<Skeleton className="h-10 w-32" />
+					</CardTitle>
+					<CardDescription className="flex items-center">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="ml-2 h-8 w-8 rounded-full" />
+					</CardDescription>
+				</div>
+				<CardAction>
+					<Skeleton className="h-10 w-24" />
 				</CardAction>
 			</CardHeader>
 		</Card>

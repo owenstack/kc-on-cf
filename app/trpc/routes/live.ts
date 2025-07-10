@@ -1,8 +1,8 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { protectedProcedure } from "../utils";
 import { eq } from "drizzle-orm";
 import { subscription, user } from "~/db/schema";
 import type { DataPoint } from "~/lib/constants";
+import { protectedProcedure } from "../utils";
 
 const MEV_CONFIG = {
 	BASE_MIN: 0.01,
@@ -31,7 +31,7 @@ export const liveRouter = {
 			const userPlan = await ctx.db.query.subscription.findFirst({
 				where: eq(subscription.userId, ctx.user.id),
 			});
-			switch (userPlan?.planType) {
+			switch (userPlan?.status !== "expired" && userPlan?.planType) {
 				case "premium":
 					return MULTIPLIERS.PREMIUM;
 				case "basic":

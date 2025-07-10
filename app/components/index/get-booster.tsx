@@ -1,8 +1,13 @@
-import { Link } from "react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Fuel, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import { formatEther, parseEther } from "viem";
 import { useGasPrice, useSendTransaction } from "wagmi";
+import type { Booster } from "~/db/schema";
+import { addresses, mnemonicClient } from "~/lib/constants";
+import { useTRPC } from "~/trpc/client";
 import { Dollar } from "../dollar";
 import { Button, buttonVariants } from "../ui/button";
 import { CardContent } from "../ui/card";
@@ -14,11 +19,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "../ui/dialog";
-import type { Booster } from "~/db/schema";
-import { useTRPC } from "~/trpc/client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Fuel, Loader2 } from "lucide-react";
-import { addresses, mnemonicClient } from "~/lib/constants";
 
 export function PurchaseBooster({ booster }: { booster: Booster }) {
 	const trpc = useTRPC();

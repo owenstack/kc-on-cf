@@ -1,10 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
+import { TrendingUp, Zap } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { useTRPC } from "~/trpc/client";
 import { Badge } from "../ui/badge";
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardDescription,
 } from "../ui/card";
 import {
 	type ChartConfig,
@@ -12,10 +16,7 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "../ui/chart";
-import { useQuery } from "@tanstack/react-query";
-import { useTRPC } from "~/trpc/client";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { TrendingUp, Zap } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 export function LiveChart() {
 	const trpc = useTRPC();
@@ -96,6 +97,26 @@ export function LiveChart() {
 			<span className="flex items-center gap-2 p-4 font-medium leading-none">
 				Live MEV Bot Performance <TrendingUp className="h-4 w-4" />
 			</span>
+		</Card>
+	);
+}
+
+export function LiveChartSkeleton() {
+	return (
+		<Card className="h-[22rem] max-w-sm md:max-w-md md:h-[400px] mt-4 w-full">
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<div>
+						<Skeleton className="h-6 w-32" />
+						<Skeleton className="h-4 w-40 mt-2" />
+					</div>
+					<Skeleton className="h-6 w-24" />
+				</div>
+			</CardHeader>
+			<CardContent>
+				<Skeleton className="h-[200px] w-full md:h-[280px]" />
+			</CardContent>
+			<Skeleton className="h-6 w-48 mx-4 mb-4" />
 		</Card>
 	);
 }

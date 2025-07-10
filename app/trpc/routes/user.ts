@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { subscription, transaction, user, userBooster } from "~/db/schema";
-import { updateUserSchema } from "~/db/zod";
+import { updateSubscriptionSchema, updateUserSchema } from "~/db/zod";
 import { protectedProcedure } from "../utils";
 
 export const userRouter = {
@@ -38,13 +38,7 @@ export const userRouter = {
 		.input(updateUserSchema)
 		.mutation(async ({ ctx, input }) => {
 			try {
-				const { data, error } = await updateUserSchema.safeParseAsync(input);
-				if (error) {
-					return {
-						error: error instanceof Error ? error.message : "Invalid input",
-					};
-				}
-				await ctx.db.update(user).set(data).where(eq(user.id, ctx.user.id));
+				await ctx.db.update(user).set(input).where(eq(user.id, ctx.user.id));
 				return { success: true, message: "User updated successfully" };
 			} catch (error) {
 				return {
@@ -89,17 +83,25 @@ export const userRouter = {
 		.input(
 			z.object({
 				planType: z.enum(["free", "basic", "premium"]),
-				planDuration: z.enum(["yearly", "monthly"]),
+				planDuration: z.enum(["monthly", "yearly"]),
+				amount: z.number(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { planType, planDuration } = input;
+			const { planType, planDuration, amount } = input;
 			try {
 				if (planType !== "free") {
+					await ctx.db.insert(transaction).values({
+						id: nanoid(15),
+						userId: ctx.user.id,
+						type: "deposit",
+						amount,
+					});
 				}
 				await ctx.db.insert(subscription).values({
 					id: nanoid(15),
 					userId: ctx.user.id,
+					amount,
 					planType,
 					planDuration,
 					startDate: new Date(),
@@ -116,6 +118,35 @@ export const userRouter = {
 								),
 				});
 				return { success: true, message: "Plan activated successfully" };
+			} catch (error) {
+				return {
+					error:
+						error instanceof Error ? error.message : "Internal server error",
+				};
+			}
+		}),
+	updateUserPlan: protectedProcedure
+		.input(updateSubscriptionSchema)
+		.mutation(async ({ ctx, input }) => {
+			try {
+				await ctx.db
+					.update(subscription)
+					.set({
+						...input,
+						startDate: new Date(),
+						endDate:
+							input.planType === "free"
+								? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+								: new Date(
+										Date.now() +
+											(input.planDuration === "monthly" ? 30 : 365) *
+												24 *
+												60 *
+												60 *
+												1000,
+									),
+					})
+					.where(eq(subscription.userId, ctx.user.id));
 			} catch (error) {
 				return {
 					error:

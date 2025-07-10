@@ -1,9 +1,9 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { protectedProcedure } from "../utils";
-import { booster, userBooster, user, transaction } from "~/db/schema";
-import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { z } from "zod";
+import { booster, transaction, user, userBooster } from "~/db/schema";
+import { protectedProcedure } from "../utils";
 
 export const boosterRouter = {
 	getAvailableBoosters: protectedProcedure.query(async ({ ctx }) => {

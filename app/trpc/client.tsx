@@ -115,12 +115,14 @@ function ClientSideProviders({
 				// Dynamic imports to avoid SSR issues
 				const [
 					{ ConnectKitProvider: CKProvider, getDefaultConfig: getConfig },
-					{ WagmiProvider: WProvider, createConfig: cConfig },
-					{ http: httpTransport },
+					{
+						WagmiProvider: WProvider,
+						createConfig: cConfig,
+						http: httpTransport,
+					},
 					{ mainnet: mainnetChain },
 				] = await Promise.all([
 					import("connectkit"),
-					import("wagmi"),
 					import("wagmi"),
 					import("wagmi/chains"),
 				]);

@@ -1,8 +1,8 @@
-import { userRouter } from "./routes/user";
-import { publicRouter } from "./routes/public";
 import { boosterRouter } from "./routes/booster";
-import { createTRPCRouter } from "./utils";
 import { liveRouter } from "./routes/live";
+import { publicRouter } from "./routes/public";
+import { userRouter } from "./routes/user";
+import { createTRPCRouter } from "./utils";
 
 export const appRouter = createTRPCRouter({
 	public: publicRouter,

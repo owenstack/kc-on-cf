@@ -68,6 +68,7 @@ export const subscription = sqliteTable("subscription", {
 	planType: text("planType", { enum: ["free", "basic", "premium"] })
 		.notNull()
 		.default("free"),
+	amount: real("amount").notNull().default(0),
 	planDuration: text("planDuration", { enum: ["monthly", "yearly"] }).notNull(),
 	startDate: integer("startDate", { mode: "timestamp" }).notNull(),
 	endDate: integer("endDate", { mode: "timestamp" }).notNull(),

@@ -1,11 +1,12 @@
-import { useTRPC } from "~/trpc/client";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { useTRPC } from "~/trpc/client";
 import {
 	Card,
 	CardContent,
+	CardDescription,
 	CardHeader,
 	CardTitle,
-	CardDescription,
 } from "../ui/card";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import {
@@ -17,7 +18,6 @@ import {
 	TableRow,
 } from "../ui/table";
 import { PurchaseBooster } from "./get-booster";
-import { Loader2 } from "lucide-react";
 
 export function MultiplierCard() {
 	const trpc = useTRPC();
