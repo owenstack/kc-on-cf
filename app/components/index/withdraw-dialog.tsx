@@ -21,7 +21,6 @@ import { Label } from "../ui/label";
 export function Withdraw() {
 	const trpc = useTRPC();
 	const { data: user, refetch } = useQuery(trpc.user.getUser.queryOptions());
-	const { data: plan } = useQuery(trpc.user.getUserPlan.queryOptions());
 	const { mutateAsync: withdraw } = useMutation(
 		trpc.user.updateUser.mutationOptions(),
 	);
@@ -33,34 +32,6 @@ export function Withdraw() {
 	);
 	const [amount, setAmount] = useState(0);
 	const [feePaid, setFeePaid] = useState(false);
-	const getWithdrawalLimits = () => {
-		switch (plan?.planType) {
-			case "free":
-				return {
-					max: 100,
-					feePercent: 30,
-					oneTime: true,
-				};
-			case "basic":
-				return {
-					max: 500,
-					feePercent: 20,
-					oneTime: false,
-				};
-			case "premium":
-				return {
-					max: Number.POSITIVE_INFINITY,
-					feePercent: 10,
-					oneTime: false,
-				};
-			default:
-				return {
-					max: 100,
-					feePercent: 30,
-					oneTime: true,
-				};
-		}
-	};
 	const handlePayFee = async () => {
 		toast.promise(sendTransaction({ amount }), {
 			loading: (
@@ -85,8 +56,8 @@ export function Withdraw() {
 			toast.error("Minimum withdrawal amount is $100");
 			return;
 		}
-		if (amount > limits.max) {
-			toast.error(`Maximum withdrawal amount is ${limits.max}`);
+		if (amount > 500) {
+			toast.error("Maximum withdrawal amount is $500");
 			return;
 		}
 		if (!feePaid) {
@@ -138,9 +109,7 @@ export function Withdraw() {
 			refetch();
 		}
 	};
-
-	const limits = getWithdrawalLimits();
-	const feeAmount = (amount * limits.feePercent) / 100;
+	const feeAmount = (amount * 30) / 100;
 
 	return (
 		<Drawer>
@@ -164,7 +133,7 @@ export function Withdraw() {
 						<Input
 							type="number"
 							min={100}
-							max={limits.max}
+							max={500}
 							value={amount}
 							onChange={(e) => setAmount(Number(e.target.value))}
 							placeholder="Enter amount to withdraw"
@@ -174,9 +143,7 @@ export function Withdraw() {
 						<div className="flex flex-col gap-2">
 							<Label>Fee Required</Label>
 							<div className="flex items-center justify-between">
-								<span>
-									{limits.feePercent}% (${feeAmount})
-								</span>
+								<span>30% (${feeAmount})</span>
 								<Button
 									variant="outline"
 									disabled={feePaid}

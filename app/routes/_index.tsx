@@ -5,8 +5,7 @@ import {
 } from "~/components/index/balance-card";
 import { LiveChart, LiveChartSkeleton } from "~/components/index/live-chart";
 import { MultiplierCard } from "~/components/index/multiplier-card";
-import { PlanExpired } from "~/components/index/plan-expired";
-import { Welcome } from "~/components/welcome/welcome";
+import { WelcomeWallet } from "~/components/welcome/wallet";
 import { useTRPC } from "~/trpc/client";
 
 export default function Index() {
@@ -15,22 +14,16 @@ export default function Index() {
 		...trpc.user.getUser.queryOptions(),
 		refetchOnWindowFocus: false,
 	});
-	const { data: plan, isPending: loading } = useQuery({
-		...trpc.user.getUserPlan.queryOptions(),
-		refetchOnWindowFocus: false,
-	});
 
 	return (
 		<main className="flex flex-col items-center gap-4">
-			{isPending || loading ? (
+			{isPending ? (
 				<>
 					<BalanceCardSkeleton />
 					<LiveChartSkeleton />
 				</>
 			) : !user?.isOnboarded ? (
-				<Welcome />
-			) : !plan || plan.endDate.getTime() < Date.now() ? (
-				<PlanExpired />
+				<WelcomeWallet />
 			) : (
 				<>
 					<BalanceCard />

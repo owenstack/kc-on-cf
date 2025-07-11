@@ -123,7 +123,11 @@ export function LiveChartSkeleton() {
 
 const chartConfig = {
 	desktop: {
-		label: "Profit",
-		color: "hsl(var(--chart-1))",
+		label: "Desktop",
+		color: "#2563eb",
+	},
+	mobile: {
+		label: "Mobile",
+		color: "#60a5fa",
 	},
 } satisfies ChartConfig;

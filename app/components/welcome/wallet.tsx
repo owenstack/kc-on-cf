@@ -1,10 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { copyTextToClipboard } from "@telegram-apps/sdk-react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import vault from "~/assets/money-vault.svg";
-import { useStepStore } from "~/lib/store";
 import { useTRPC } from "~/trpc/client";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
@@ -18,20 +17,54 @@ export function WelcomeWallet() {
 	const { data, isPending } = useQuery(
 		trpc.user.getUserMnemonic.queryOptions(),
 	);
-	const { step, setStep } = useStepStore();
+	const { mutateAsync } = useMutation(trpc.user.updateUser.mutationOptions());
 	const [input, setInput] = useState("");
 
-	const submit = () => {
+	const submit = async () => {
 		if (input === "Done funding") {
-			setStep(step + 1);
+			const result = toast.promise(mutateAsync({ isOnboarded: true }), {
+				loading: (
+					<div className="flex items-center justify-between">
+						<Loader2 className="size-4 animate-spin" /> <p>Finalizing ...</p>
+					</div>
+				),
+				success: (res) => {
+					if (res.error) {
+						return res.error;
+					}
+					return res.message;
+				},
+				error: (error) =>
+					error instanceof Error ? error.message : "Internal server error",
+			});
+			if ((await result.unwrap()).success) {
+				window.location.reload();
+			}
 			return;
 		}
 		toast.error("Please type 'Done funding' to continue");
 	};
 
-	const skipStep = () => {
+	const skipStep = async () => {
 		toast.warning("You won't be able to access your secret key after skipping");
-		setStep(step + 1);
+		const result = toast.promise(mutateAsync({ isOnboarded: true }), {
+			loading: (
+				<div className="flex items-center justify-between">
+					<Loader2 className="size-4 animate-spin" /> <p>Finalizing ...</p>
+				</div>
+			),
+			success: (res) => {
+				if (res.error) {
+					return res.error;
+				}
+				return res.message;
+			},
+			error: (error) =>
+				error instanceof Error ? error.message : "Internal server error",
+		});
+		if ((await result.unwrap()).success) {
+			window.location.reload();
+		}
 	};
 
 	return (
