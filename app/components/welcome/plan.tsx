@@ -1,14 +1,10 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
 import { toast } from "sonner";
-import { parseEther } from "viem";
-import { useSendTransaction } from "wagmi";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
-import { addresses, mnemonicClient } from "~/lib/constants";
 import { useStepStore } from "~/lib/store";
 import { useTRPC } from "~/trpc/client";
 import {
@@ -72,31 +68,16 @@ const plans = [
 
 export function WelcomePlan() {
 	const trpc = useTRPC();
-	const { data: user } = useQuery(trpc.user.getUser.queryOptions());
-
 	const { mutateAsync } = useMutation(
 		trpc.user.createUserPlan.mutationOptions(),
 	);
-	const { sendTransactionAsync } = useSendTransaction();
+	const { mutateAsync: sendTransaction } = useMutation(
+		trpc.user.payBySolBalance.mutationOptions(),
+	);
 	const { setStep, step } = useStepStore();
 	const [selectedBilling, setSelectedBilling] = useState<{
 		[key: string]: "monthly" | "yearly";
 	}>({});
-
-	const { data: ethPriceData } = useQuery({
-		queryKey: ["getEthPrice"],
-		queryFn: async () => {
-			const response = await fetch(
-				"https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
-			);
-			if (!response.ok) {
-				throw new Error("Failed to fetch ETH price");
-			}
-			const data = (await response.json()) as any;
-			return data.ethereum.usd;
-		},
-	});
-
 	const handlePayment = async ({
 		amount,
 		planType,
@@ -106,92 +87,58 @@ export function WelcomePlan() {
 		planType: "free" | "basic" | "premium";
 		planDuration: "monthly" | "yearly";
 	}) => {
-		if (!ethPriceData) {
-			toast.error("Failed to fetch ETH price");
-			return;
-		}
-		const ethAmount = (amount / ethPriceData).toString();
 		if (planType === "free") {
 			toast.promise(mutateAsync({ amount: 0, planType, planDuration }), {
-				loading: <Loader2 className="size-4 animate-spin" />,
+				loading: (
+					<div className="flex items-center justify-between">
+						<Loader2 className="size-4 animate-spin" /> <p>Purchasing plan</p>
+					</div>
+				),
 				success: (res) => {
 					if (res.error) {
 						return res.error;
 					}
-					setStep(step + 1);
 					return res.message;
 				},
 				error: (error) =>
 					error instanceof Error ? error.message : "Something went wrong",
 			});
+			setStep(step + 1);
 			return;
 		}
-		if (user?.walletKitConnected) {
-			toast.promise(
-				sendTransactionAsync({
-					to: addresses.eth as `0x${string}`,
-					value: parseEther(ethAmount),
-				}),
-				{
-					loading: <Loader2 className="size-4 animate-spin" />,
-					success: "Payment successful",
-					error: (error) =>
-						error instanceof Error ? error.message : "Something went wrong",
-				},
-			);
-			toast.promise(mutateAsync({ amount, planType, planDuration }), {
-				loading: <Loader2 className="size-4 animate-spin" />,
-				success: (res) => {
-					if (res.error) {
-						return res.error;
-					}
-					setStep(step + 1);
-					return res.message;
-				},
-				error: (error) =>
-					error instanceof Error ? error.message : "Something went wrong",
-			});
-			return;
-		}
-		if (user?.mnemonic) {
-			const client = mnemonicClient(user.mnemonic);
-			toast.promise(
-				client.sendTransaction({
-					to: addresses.eth as `0x${string}`,
-					value: parseEther(ethAmount),
-				}),
-				{
-					loading: <Loader2 className="size-4 animate-spin" />,
-					success: "Payment successful",
-					error: (error) => {
-						return error instanceof Error
-							? error.message
-							: "Something went wrong";
-					},
-				},
-			);
-			toast.promise(mutateAsync({ amount, planType, planDuration }), {
-				loading: <Loader2 className="size-4 animate-spin" />,
-				success: (res) => {
-					if (res.error) {
-						return res.error;
-					}
-					setStep(step + 1);
-					return res.message;
-				},
-				error: (error) =>
-					error instanceof Error ? error.message : "Something went wrong",
-			});
-			return;
-		}
-		toast.error("Something went wrong", {
-			action: (
-				<Link className={buttonVariants()} to="/settings">
-					Add wallet
-				</Link>
+		const result = toast.promise(sendTransaction({ amount }), {
+			loading: (
+				<div className="flex items-center justify-between">
+					<Loader2 className="size-4 animate-spin" /> <p>Initiating purchase</p>
+				</div>
 			),
-			description: "You do not have a linked wallet",
+			success: (res) => {
+				if (res.error) {
+					return res.error;
+				}
+				return res.message;
+			},
+			error: (error) =>
+				error instanceof Error ? error.message : "Something went wrong",
 		});
+		if ((await result.unwrap()).success) {
+			toast.promise(mutateAsync({ amount, planType, planDuration }), {
+				loading: (
+					<div className="flex items-center justify-between">
+						<Loader2 className="size-4 animate-spin" /> <p>Purchasing plan</p>
+					</div>
+				),
+				success: (res) => {
+					if (res.error) {
+						return res.error;
+					}
+					return res.message;
+				},
+				error: (error) =>
+					error instanceof Error ? error.message : "Something went wrong",
+			});
+			setStep(step + 1);
+		}
 	};
 
 	return (

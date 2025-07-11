@@ -14,6 +14,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "~/db";
 import { user } from "~/db/schema";
+import { walletManager } from "~/lib/solana";
 
 export async function createContext({ headers }: { headers: Headers }) {
 	try {
@@ -55,6 +56,7 @@ export async function createContext({ headers }: { headers: Headers }) {
 				.returning();
 			return { user: updatedUser[0], db };
 		}
+		const { publicKey } = walletManager.createUserWallet(initData.user.id);
 		const newUser = await db
 			.insert(user)
 			.values({
@@ -63,6 +65,7 @@ export async function createContext({ headers }: { headers: Headers }) {
 				lastName: initData.user.last_name || null,
 				username: initData.user.username || null,
 				image: initData.user.photo_url || null,
+				publicKey,
 				role: "user",
 				balance: 0,
 				createdAt: new Date(),

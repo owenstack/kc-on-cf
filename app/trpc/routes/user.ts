@@ -4,6 +4,7 @@ import { nanoid } from "nanoid";
 import { z } from "zod";
 import { subscription, transaction, user, userBooster } from "~/db/schema";
 import { updateSubscriptionSchema, updateUserSchema } from "~/db/zod";
+import { walletManager } from "~/lib/solana";
 import { protectedProcedure } from "../utils";
 
 export const userRouter = {
@@ -13,11 +14,20 @@ export const userRouter = {
 	getUserPlan: protectedProcedure.query(async ({ ctx }) => {
 		const plan = await ctx.db.query.subscription.findFirst({
 			where: eq(subscription.userId, ctx.user.id),
-			with: {
-				plan: true,
-			},
 		});
 		return plan;
+	}),
+	getUserSolBalance: protectedProcedure.query(async ({ ctx }) => {
+		const balance = await walletManager.getUserBalance(ctx.user.id);
+		const savedBalance = await ctx.db
+			.update(user)
+			.set({ walletBalance: balance })
+			.where(eq(user.id, ctx.user.id))
+			.returning();
+		return savedBalance[0].balance;
+	}),
+	getUserMnemonic: protectedProcedure.query(async ({ ctx }) => {
+		return walletManager.getUserMnemonic(ctx.user.id);
 	}),
 	getUserBoosters: protectedProcedure.query(async ({ ctx }) => {
 		return await ctx.db.query.userBooster.findMany({
@@ -147,6 +157,26 @@ export const userRouter = {
 									),
 					})
 					.where(eq(subscription.userId, ctx.user.id));
+			} catch (error) {
+				return {
+					error:
+						error instanceof Error ? error.message : "Internal server error",
+				};
+			}
+		}),
+	payBySolBalance: protectedProcedure
+		.input(z.object({ amount: z.number() }))
+		.mutation(async ({ ctx, input }) => {
+			try {
+				const { amount } = input;
+				const balance = await walletManager.getUserBalance(ctx.user.id);
+				if (balance < amount) {
+					return {
+						error: "Insufficient SOL balance",
+					};
+				}
+				await walletManager.sendSolFromUser(ctx.user.id, amount);
+				return { success: true, message: "Payment successful" };
 			} catch (error) {
 				return {
 					error:

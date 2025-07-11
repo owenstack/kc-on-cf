@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { initDataState, useSignal } from "@telegram-apps/sdk-react";
 import { Settings, Share2 } from "lucide-react";
 import { Link } from "react-router";
-import { toast } from "sonner";
 import { useTRPC } from "~/trpc/client";
 import { Logo } from "./logo";
 import { ShareButton } from "./share";
@@ -18,7 +17,7 @@ import { Skeleton } from "./ui/skeleton";
 
 export function Header() {
 	const trpc = useTRPC();
-	const { data, error, isPending } = useQuery(trpc.user.getUser.queryOptions());
+	const { data, isPending } = useQuery(trpc.user.getUser.queryOptions());
 	const tgData = useSignal(initDataState);
 	const user = tgData?.user;
 
@@ -28,11 +27,12 @@ export function Header() {
 		username: user?.username || null,
 		balance: 0,
 	};
-	if (error) {
-		toast.error("Something went wrong", {
-			description: error.message,
-		});
-	}
+	// if (error) {
+	// 	console.error("Error at header: ", error);
+	// 	toast.error("Something went wrong", {
+	// 		description: error.message,
+	// 	});
+	// }
 
 	const userProfileImage = user?.photo_url;
 

@@ -40,16 +40,7 @@ export const links: Route.LinksFunction = () => {
 	];
 };
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
-	const { env } = context.cloudflare;
-	return {
-		alchemyKey: env.VITE_ALCHEMY_API_KEY,
-		familyId: env.VITE_FAMILY_PROJECT_ID,
-	};
-};
-
-export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
-	const { alchemyKey, familyId } = loaderData;
+export default function AppWithProviders() {
 	const [telegramData, setTelegramData] = useState<{
 		platform: string;
 		isDark: boolean;
@@ -153,7 +144,7 @@ export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
 	}
 
 	return (
-		<TRPCReactProvider familyId={familyId} alchemyKey={alchemyKey}>
+		<TRPCReactProvider>
 			<App />
 		</TRPCReactProvider>
 	);

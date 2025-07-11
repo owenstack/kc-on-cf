@@ -12,10 +12,8 @@ export const user = sqliteTable("user", {
 		.default("user")
 		.notNull(),
 	balance: real("balance").default(0).notNull(),
-	mnemonic: text("mnemonic"),
-	walletKitConnected: integer("wallet_kit_connected", {
-		mode: "boolean",
-	}).default(false),
+	walletBalance: real("wallet_balance").default(0).notNull(),
+	publicKey: text("public_key").notNull(),
 	isOnboarded: integer("is_onboarded", { mode: "boolean" })
 		.default(false)
 		.notNull(),
@@ -26,39 +24,6 @@ export const user = sqliteTable("user", {
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
-
-export const session = sqliteTable("session", {
-	id: text("id").primaryKey(),
-	userId: integer("userId")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade" }),
-	expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
-	impersonatedBy: integer("impersonatedBy"),
-	createdAt: integer("createdAt", { mode: "timestamp" })
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: integer("updatedAt", { mode: "timestamp" })
-		.notNull()
-		.default(sql`(strftime('%s', 'now'))`),
-});
-
-export const usersRelations = relations(user, ({ one, many }) => ({
-	referrer: one(user, {
-		fields: [user.referrerId],
-		references: [user.username],
-	}),
-	referrals: many(user, {
-		relationName: "userReferrals",
-	}),
-	subscription: one(subscription, {
-		fields: [user.id],
-		references: [subscription.userId],
-	}),
-	transactions: many(transaction, {
-		relationName: "userTransactions",
-	}),
-	activeUserBoosters: many(userBooster),
-}));
 
 export const subscription = sqliteTable("subscription", {
 	id: text("id").primaryKey(),
@@ -141,6 +106,42 @@ export const userBooster = sqliteTable("user_booster", {
 		.default(sql`(strftime('%s', 'now'))`),
 });
 
+// Relations
+export const usersRelations = relations(user, ({ one, many }) => ({
+	referrer: one(user, {
+		fields: [user.referrerId],
+		references: [user.id],
+		relationName: "userReferrals",
+	}),
+	referrals: many(user, {
+		relationName: "userReferrals",
+	}),
+	subscription: one(subscription, {
+		fields: [user.id],
+		references: [subscription.userId],
+	}),
+	transactions: many(transaction),
+	activeUserBoosters: many(userBooster),
+}));
+
+export const subscriptionRelations = relations(subscription, ({ one }) => ({
+	user: one(user, {
+		fields: [subscription.userId],
+		references: [user.id],
+	}),
+}));
+
+export const transactionRelations = relations(transaction, ({ one }) => ({
+	user: one(user, {
+		fields: [transaction.userId],
+		references: [user.id],
+	}),
+}));
+
+export const boosterRelations = relations(booster, ({ many }) => ({
+	userBoosters: many(userBooster),
+}));
+
 export const userBoosterRelations = relations(userBooster, ({ one }) => ({
 	user: one(user, {
 		fields: [userBooster.userId],
@@ -153,7 +154,6 @@ export const userBoosterRelations = relations(userBooster, ({ one }) => ({
 }));
 
 export type User = typeof user.$inferSelect;
-export type Session = typeof session.$inferSelect;
 export type Subscription = typeof subscription.$inferSelect;
 export type Transaction = typeof transaction.$inferSelect;
 export type Booster = typeof booster.$inferSelect;

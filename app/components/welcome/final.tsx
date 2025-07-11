@@ -1,21 +1,42 @@
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import rocket from "~/assets/product-launch.svg";
-import { mnemonicClient } from "~/lib/constants";
-import { useStepStore } from "~/lib/store";
 import { useTRPC } from "~/trpc/client";
-import { ConnectKit } from "../cex";
 import { Button } from "../ui/button";
 
 export function FinalStep() {
 	const trpc = useTRPC();
-	const { data: plan } = useQuery(trpc.user.getUserPlan.queryOptions());
-	const { data: user } = useQuery(trpc.user.getUser.queryOptions());
-	const [mnemonicAddress, setMnemonicAddress] = useState("");
-	if (user?.mnemonic) {
-		setMnemonicAddress(mnemonicClient(user.mnemonic).account.address);
-	}
-	const { clearStep } = useStepStore();
+	const { data: plan } = useQuery({
+		...trpc.user.getUserPlan.queryOptions(),
+		refetchOnWindowFocus: false,
+	});
+	const { data: user } = useQuery({
+		...trpc.user.getUser.queryOptions(),
+		refetchOnWindowFocus: false,
+	});
+	const { mutateAsync } = useMutation(trpc.user.updateUser.mutationOptions());
+
+	const handleFinal = async () => {
+		const result = toast.promise(mutateAsync({ isOnboarded: true }), {
+			loading: (
+				<div className="flex items-center justify-between">
+					<Loader2 className="size-4 animate-spin" /> <p>Finalizing ...</p>
+				</div>
+			),
+			success: (res) => {
+				if (res.error) {
+					return res.error;
+				}
+				return res.message;
+			},
+			error: (error) =>
+				error instanceof Error ? error.message : "Internal server error",
+		});
+		if ((await result.unwrap()).success) {
+			window.location.reload();
+		}
+	};
 	return (
 		<main className="flex flex-col items-center gap-4">
 			<img
@@ -45,11 +66,7 @@ export function FinalStep() {
 					<div className="flex justify-between py-2  border-t-2">
 						<span className="text-gray-600">Wallet</span>
 						<span className="font-medium">
-							{user?.walletKitConnected ? (
-								<ConnectKit />
-							) : (
-								`${mnemonicAddress.slice(0, 6)}...${mnemonicAddress.slice(-6)}`
-							)}
+							{user?.publicKey.slice(0, 6)}...${user?.publicKey.slice(-6)}
 						</span>
 					</div>
 
@@ -59,14 +76,7 @@ export function FinalStep() {
 					</div>
 				</div>
 			</div>
-			<Button
-				onClick={() => {
-					clearStep();
-					window.location.reload();
-				}}
-			>
-				Confirm & Start Mining
-			</Button>
+			<Button onClick={handleFinal}>Confirm & Start Mining</Button>
 		</main>
 	);
 }

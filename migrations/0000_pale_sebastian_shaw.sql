@@ -1,30 +1,20 @@
 CREATE TABLE `booster` (
 	`id` text PRIMARY KEY NOT NULL,
-	`userId` integer NOT NULL,
-	`boosterId` text NOT NULL,
-	`activatedAt` integer NOT NULL,
-	`expiresAt` integer,
-	`type` text NOT NULL,
+	`name` text NOT NULL,
+	`description` text NOT NULL,
 	`multiplier` real NOT NULL,
+	`duration` integer,
+	`price` real NOT NULL,
+	`type` text NOT NULL,
 	`createdAt` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`updatedAt` integer DEFAULT (strftime('%s', 'now')) NOT NULL,
-	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
-CREATE TABLE `session` (
-	`id` text PRIMARY KEY NOT NULL,
-	`userId` integer NOT NULL,
-	`expiresAt` integer NOT NULL,
-	`impersonatedBy` integer,
-	`createdAt` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`updatedAt` integer DEFAULT (strftime('%s', 'now')) NOT NULL,
-	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
+	`updatedAt` integer DEFAULT (strftime('%s', 'now')) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `subscription` (
 	`id` text PRIMARY KEY NOT NULL,
 	`userId` integer NOT NULL,
 	`planType` text DEFAULT 'free' NOT NULL,
+	`amount` real DEFAULT 0 NOT NULL,
 	`planDuration` text NOT NULL,
 	`startDate` integer NOT NULL,
 	`endDate` integer NOT NULL,
@@ -56,8 +46,8 @@ CREATE TABLE `user` (
 	`image` text,
 	`role` text DEFAULT 'user' NOT NULL,
 	`balance` real DEFAULT 0 NOT NULL,
-	`mnemonic` text,
-	`wallet_kit_connected` integer DEFAULT false,
+	`wallet_balance` real DEFAULT 0 NOT NULL,
+	`public_key` text NOT NULL,
 	`is_onboarded` integer DEFAULT false NOT NULL,
 	`referrer_id` integer,
 	`banned` integer DEFAULT false NOT NULL,
@@ -67,4 +57,15 @@ CREATE TABLE `user` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `user_telegram_id_unique` ON `user` (`telegram_id`);
+CREATE UNIQUE INDEX `user_telegram_id_unique` ON `user` (`telegram_id`);--> statement-breakpoint
+CREATE TABLE `user_booster` (
+	`id` text PRIMARY KEY NOT NULL,
+	`userId` integer NOT NULL,
+	`boosterId` text NOT NULL,
+	`activatedAt` integer NOT NULL,
+	`expiresAt` integer,
+	`createdAt` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	`updatedAt` integer DEFAULT (strftime('%s', 'now')) NOT NULL,
+	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`boosterId`) REFERENCES `booster`(`id`) ON UPDATE no action ON DELETE cascade
+);
