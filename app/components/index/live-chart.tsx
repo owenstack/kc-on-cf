@@ -20,10 +20,12 @@ import { Skeleton } from "../ui/skeleton";
 
 export function LiveChart() {
 	const trpc = useTRPC();
+	const { data } = useQuery(trpc.user.getUserSolBalance.queryOptions());
 	const { data: chartData } = useQuery({
 		...trpc.live.mevData.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
+		enabled: data != null && data > 5,
 	});
 	const { data: activeBoosters } = useQuery(
 		trpc.user.getUserBoosters.queryOptions(),

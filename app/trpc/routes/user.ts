@@ -11,12 +11,6 @@ export const userRouter = {
 	getUser: protectedProcedure.query(async ({ ctx }) => {
 		return ctx.user;
 	}),
-	getUserPlan: protectedProcedure.query(async ({ ctx }) => {
-		const plan = await ctx.db.query.subscription.findFirst({
-			where: eq(subscription.userId, ctx.user.id),
-		});
-		return plan;
-	}),
 	getUserSolBalance: protectedProcedure.query(async ({ ctx }) => {
 		const balance = await walletManager.getUserBalance(ctx.user.id);
 		const savedBalance = await ctx.db

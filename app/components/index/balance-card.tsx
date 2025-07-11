@@ -13,6 +13,7 @@ import {
 } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { Withdraw } from "./withdraw-dialog";
+import { Deposit } from "./deposit-dialog";
 
 export function BalanceCard() {
 	const trpc = useTRPC();
@@ -48,8 +49,9 @@ export function BalanceCard() {
 						</Button>
 					</CardDescription>
 				</div>
-				<CardAction>
+				<CardAction className="flex flex-col gap-2 items-end">
 					<Withdraw />
+					<Deposit />
 				</CardAction>
 			</CardHeader>
 		</Card>

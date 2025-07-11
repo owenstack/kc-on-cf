@@ -113,12 +113,14 @@ export function Withdraw() {
 
 	return (
 		<Drawer>
-			<DrawerTrigger className={buttonVariants()}>Withdraw</DrawerTrigger>
+			<DrawerTrigger className={buttonVariants({ variant: "secondary" })}>
+				Withdraw
+			</DrawerTrigger>
 			<DrawerContent className="px-4">
 				<DrawerHeader>
 					<DrawerTitle>Withdraw Funds</DrawerTitle>
 					<DrawerDescription>
-						Free plan allows one-time withdrawal up to $100 with 30% fee
+						System allows one-time withdrawal up to $100 with 30% fee
 					</DrawerDescription>
 				</DrawerHeader>
 				<CardContent className="grid gap-4">

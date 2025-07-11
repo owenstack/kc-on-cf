@@ -96,7 +96,7 @@ export function WelcomeWallet() {
 						) : (
 							<div className="flex items-center gap-4">
 								<Textarea
-									placeholder="Generated wallet address"
+									placeholder="Generated wallet nnemonic"
 									value={data}
 									readOnly
 									className="font-mono text-sm"
