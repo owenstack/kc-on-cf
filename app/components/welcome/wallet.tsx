@@ -29,6 +29,11 @@ export function WelcomeWallet() {
 		toast.error("Please type 'Done funding' to continue");
 	};
 
+	const skipStep = () => {
+		toast.warning("You won't be able to access your secret key after skipping");
+		setStep(step + 1);
+	};
+
 	return (
 		<main className="container mx-auto max-w-3xl px-4 py-8">
 			<Card className="overflow-hidden">
@@ -98,6 +103,19 @@ export function WelcomeWallet() {
 							/>
 							<Button onClick={submit}>Continue</Button>
 						</div>
+						<div className="flex justify-end">
+							<Button variant="ghost" onClick={skipStep}>
+								Skip for now
+							</Button>
+						</div>
+						<Alert>
+							<AlertCircle className="h-4 w-4" />
+							<AlertDescription className="ml-2">
+								You can skip this step, but you won't be able to access your
+								secret key again. Your balance will still be visible in the
+								dashboard.
+							</AlertDescription>
+						</Alert>
 					</div>
 				</CardContent>
 			</Card>
