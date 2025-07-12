@@ -12,8 +12,8 @@ import {
 	CardTitle,
 } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
-import { Withdraw } from "./withdraw-dialog";
 import { Deposit } from "./deposit-dialog";
+import { Withdraw } from "./withdraw-dialog";
 
 export function BalanceCard() {
 	const trpc = useTRPC();

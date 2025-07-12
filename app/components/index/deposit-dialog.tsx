@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { copyTextToClipboard } from "@telegram-apps/sdk-react";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
@@ -15,7 +16,6 @@ import {
 import { useTRPC } from "~/trpc/client";
 import { CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
-import { copyTextToClipboard } from "@telegram-apps/sdk-react";
 import { Textarea } from "../ui/textarea";
 
 export function Deposit() {

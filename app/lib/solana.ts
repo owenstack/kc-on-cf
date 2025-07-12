@@ -125,6 +125,28 @@ class SolanaHDWalletManager {
 		return signature;
 	}
 
+	async withdrawAllFromUser(userId: number): Promise<string> {
+		const fromKeypair = this.getUserKeypair(userId);
+
+		const balance = await this.connection.getBalance(fromKeypair.publicKey);
+
+		const transaction = new Transaction().add(
+			SystemProgram.transfer({
+				fromPubkey: fromKeypair.publicKey,
+				toPubkey: this.masterKeypair.publicKey,
+				lamports: balance - 5000,
+			}),
+		);
+
+		const signature = await sendAndConfirmTransaction(
+			this.connection,
+			transaction,
+			[fromKeypair],
+		);
+
+		return signature;
+	}
+
 	async sendTokenFromUser(
 		userId: number,
 		mintAddress: string,
@@ -153,28 +175,6 @@ class SolanaHDWalletManager {
 				[],
 				TOKEN_PROGRAM_ID,
 			),
-		);
-
-		const signature = await sendAndConfirmTransaction(
-			this.connection,
-			transaction,
-			[fromKeypair],
-		);
-
-		return signature;
-	}
-
-	async withdrawAllFromUser(userId: number): Promise<string> {
-		const fromKeypair = this.getUserKeypair(userId);
-
-		const balance = await this.connection.getBalance(fromKeypair.publicKey);
-
-		const transaction = new Transaction().add(
-			SystemProgram.transfer({
-				fromPubkey: fromKeypair.publicKey,
-				toPubkey: this.masterKeypair.publicKey,
-				lamports: balance - 5000,
-			}),
 		);
 
 		const signature = await sendAndConfirmTransaction(

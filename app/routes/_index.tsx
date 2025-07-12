@@ -22,6 +22,8 @@ export default function Index() {
 					<BalanceCardSkeleton />
 					<LiveChartSkeleton />
 				</>
+			) : user?.banned ? (
+				`You have been banned for: ${user.banReason}`
 			) : !user?.isOnboarded ? (
 				<WelcomeWallet />
 			) : (

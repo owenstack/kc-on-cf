@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { copyTextToClipboard } from "@telegram-apps/sdk-react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -96,7 +96,7 @@ export function WelcomeWallet() {
 						) : (
 							<div className="flex items-center gap-4">
 								<Textarea
-									placeholder="Generated wallet nnemonic"
+									placeholder="Generated wallet mnemonic"
 									value={data}
 									readOnly
 									className="font-mono text-sm"

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { User } from "~/db/schema";
 
 export interface ButtonProps {
 	variant?:
@@ -16,4 +17,34 @@ export interface ButtonProps {
 export interface DataPoint {
 	timestamp: number;
 	value: number;
+}
+
+export interface BoosterOverview {
+	analytics: {
+		activeUsers: number;
+		totalPurchases: number;
+		uniqueUsers: number;
+		revenue: number;
+		avgDurationMs: number;
+		avgDurationDays: number;
+		purchaseFrequency: number;
+		activeUsersPercentage: number;
+	};
+	id: string;
+	name: string;
+	createdAt: Date;
+	updatedAt: Date;
+	type: "oneTime" | "permanent" | "duration";
+	description: string;
+	price: number;
+	userBoosters: {
+		user: User;
+		id: string;
+		userId: number;
+		boosterId: string;
+		activatedAt: Date;
+		expiresAt: Date | null;
+		createdAt: Date;
+		updatedAt: Date;
+	}[];
 }

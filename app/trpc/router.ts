@@ -1,3 +1,4 @@
+import { adminRouter } from "./routes/admin";
 import { boosterRouter } from "./routes/booster";
 import { liveRouter } from "./routes/live";
 import { publicRouter } from "./routes/public";
@@ -9,6 +10,7 @@ export const appRouter = createTRPCRouter({
 	user: userRouter,
 	booster: boosterRouter,
 	live: liveRouter,
+	admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;
