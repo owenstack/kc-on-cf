@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  telegramId    Int       @unique @map("telegram_id")
+  firstName     String    @map("first_name")
+  lastName      String?   @map("last_name")
+  username      String?
+  image         String?
+  role          String    @default("user")
+  balance       Float     @default(0)
+  walletBalance Float     @default(0) @map("wallet_balance")
+  publicKey     String    @map("public_key")
+  isOnboarded   Boolean   @default(false) @map("is_onboarded")
+  referrerId    Int?      @map("referrer_id")
+  banned        Boolean   @default(false)
+  banReason     String?   @map("ban_reason")
+  banExpires    DateTime? @map("ban_expires")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  referrer     User?         @relation("UserReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
+  referrals    User[]        @relation("UserReferrals")
+  transactions Transaction[]
+  userBoosters UserBooster[]
+
+  @@map("user")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      Int
+  type        String
+  amount      Float
+  status      String   @default("pending")
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transaction")
+}
+
+model Booster {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  multiplier  Float
+  duration    Int? // Duration in seconds, null for permanent boosters
+  price       Float
+  type        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userBoosters UserBooster[]
+
+  @@map("booster")
+}
+
+model UserBooster {
+  id          String    @id @default(cuid())
+  userId      Int
+  boosterId   String
+  activatedAt DateTime
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booster Booster @relation(fields: [boosterId], references: [id], onDelete: Cascade)
+
+  @@map("user_booster")
+}

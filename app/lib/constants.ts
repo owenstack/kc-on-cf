@@ -1,5 +1,5 @@
+import type { User } from "generated/prisma";
 import type { ReactNode } from "react";
-import type { User } from "~/db/schema";
 
 export interface ButtonProps {
 	variant?:

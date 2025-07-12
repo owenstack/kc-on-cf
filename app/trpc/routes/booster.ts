@@ -1,13 +1,10 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { nanoid } from "nanoid";
 import { z } from "zod";
-import { booster, transaction, user, userBooster } from "~/db/schema";
 import { protectedProcedure } from "../utils";
 
 export const boosterRouter = {
 	getAvailableBoosters: protectedProcedure.query(async ({ ctx }) => {
-		return await ctx.db.query.booster.findMany();
+		return await ctx.db.booster.findMany();
 	}),
 	purchaseBooster: protectedProcedure
 		.input(
@@ -20,8 +17,8 @@ export const boosterRouter = {
 			const { boosterId, externalPayment } = input;
 			const now = Date.now();
 			try {
-				const dbBooster = await ctx.db.query.booster.findFirst({
-					where: eq(booster.id, boosterId),
+				const dbBooster = await ctx.db.booster.findUnique({
+					where: { id: boosterId },
 				});
 				if (!dbBooster) {
 					return { error: "Booster does not exist" };
@@ -32,45 +29,47 @@ export const boosterRouter = {
 						: undefined;
 				if (externalPayment) {
 					await Promise.all([
-						await ctx.db.insert(userBooster).values({
-							id: nanoid(15),
-							userId: ctx.user.id,
-							boosterId,
-							activatedAt: new Date(),
-							expiresAt: new Date(expiresAt ?? now),
+						await ctx.db.userBooster.create({
+							data: {
+								userId: ctx.user.id,
+								boosterId,
+								activatedAt: new Date(),
+								expiresAt: expiresAt ?? null,
+							},
 						}),
-						await ctx.db.insert(transaction).values({
-							id: nanoid(15),
-							userId: ctx.user.id,
-							type: "purchase",
-							amount: dbBooster.price,
-							status: "success",
-							description: `Booster ${dbBooster.name} purchased`,
-							metadata: null,
+						await ctx.db.transaction.create({
+							data: {
+								userId: ctx.user.id,
+								type: "purchase",
+								amount: dbBooster.price,
+								status: "success",
+								description: `Booster ${dbBooster.name} purchased`,
+							},
 						}),
 					]);
 					return { success: true, message: "Booster purchased successfully" };
 				}
 				await Promise.all([
-					ctx.db
-						.update(user)
-						.set({ balance: ctx.user.balance - dbBooster.price })
-						.where(eq(user.id, ctx.user.id)),
-					ctx.db.insert(userBooster).values({
-						id: nanoid(15),
-						userId: ctx.user.id,
-						boosterId,
-						activatedAt: new Date(),
-						expiresAt: new Date(expiresAt ?? now),
+					await ctx.db.user.update({
+						where: { id: ctx.user.id },
+						data: { balance: ctx.user.balance - dbBooster.price },
 					}),
-					await ctx.db.insert(transaction).values({
-						id: nanoid(15),
-						userId: ctx.user.id,
-						type: "purchase",
-						amount: dbBooster.price,
-						status: "success",
-						description: `Booster ${dbBooster.name} purchased`,
-						metadata: null,
+					await ctx.db.userBooster.create({
+						data: {
+							userId: ctx.user.id,
+							boosterId,
+							activatedAt: new Date(),
+							expiresAt: new Date(expiresAt ?? now),
+						},
+					}),
+					await ctx.db.transaction.create({
+						data: {
+							userId: ctx.user.id,
+							type: "purchase",
+							amount: dbBooster.price,
+							status: "success",
+							description: `Booster ${dbBooster.name} purchased`,
+						},
 					}),
 				]);
 				return { success: true, message: "Booster purchased successfully" };

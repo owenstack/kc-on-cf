@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import {
 	createAssociatedTokenAccountInstruction,
 	createTransferInstruction,
@@ -17,6 +16,7 @@ import {
 import * as bip39 from "bip39";
 import bs58 from "bs58";
 import { derivePath } from "ed25519-hd-key";
+import { env } from "~/lib/env";
 
 class SolanaHDWalletManager {
 	private masterSeed: Buffer;

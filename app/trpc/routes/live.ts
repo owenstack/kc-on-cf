@@ -1,6 +1,4 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { subscription, user } from "~/db/schema";
 import type { DataPoint } from "~/lib/constants";
 import { protectedProcedure } from "../utils";
 
@@ -13,9 +11,6 @@ const MEV_CONFIG = {
 };
 
 const MULTIPLIERS = {
-	PREMIUM: 1.5,
-	BASIC: 0.8,
-	FREE: 0.1,
 	MAX_TIME_BASED: 0.3,
 	TIME_GROWTH_RATE: 0.02,
 };
@@ -27,19 +22,6 @@ export const liveRouter = {
 		const points: DataPoint[] = [];
 		const count = 100;
 		const startTime = Date.now() - count * 1000;
-		const userPlanMultiplier = async () => {
-			const userPlan = await ctx.db.query.subscription.findFirst({
-				where: eq(subscription.userId, ctx.user.id),
-			});
-			switch (userPlan?.status !== "expired" && userPlan?.planType) {
-				case "premium":
-					return MULTIPLIERS.PREMIUM;
-				case "basic":
-					return MULTIPLIERS.BASIC;
-				default:
-					return MULTIPLIERS.FREE;
-			}
-		};
 		const accountAgeInWeeks =
 			(Date.now() - ctx.user.createdAt.getTime()) / (1000 * 60 * 60 * 24 * 7);
 		const timeMultplier = Math.max(
@@ -55,12 +37,12 @@ export const liveRouter = {
 			const min = isSpike ? SPIKE_MIN : BASE_MIN;
 			const max = isSpike ? SPIKE_MAX : BASE_MAX;
 			const baseValue = min + Math.random() + (max - min);
-			const value = baseValue * timeBonus * (await userPlanMultiplier());
+			const value = baseValue * timeBonus;
 			const timestamp = startTime + i * 1000;
-			await ctx.db
-				.update(user)
-				.set({ balance: ctx.user.balance + value })
-				.where(eq(user.id, ctx.user.id));
+			await ctx.db.user.update({
+				where: { id: ctx.user.id },
+				data: { balance: ctx.user.balance + value },
+			});
 			points.push({
 				timestamp,
 				value,

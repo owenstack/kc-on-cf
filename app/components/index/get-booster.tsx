@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import type { Booster } from "generated/prisma";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { Booster } from "~/db/schema";
 import { useTRPC } from "~/trpc/client";
 import { Dollar } from "../dollar";
 import { Button, buttonVariants } from "../ui/button";
