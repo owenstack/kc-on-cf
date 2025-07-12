@@ -1,21 +1,13 @@
 import type { TRPCRouterRecord } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { booster, user } from "~/db/schema";
-import { insertBoosterSchema, updateUserSchema } from "~/db/zod";
+import { boosterSchema, userSchema } from "~/db/zod";
 import { walletManager } from "~/lib/solana";
 import { adminProcedure } from "../utils";
 
 export const adminRouter = {
 	getBoosters: adminProcedure.query(async ({ ctx }) => {
-		const boosters = await ctx.db.query.booster.findMany({
-			with: {
-				userBoosters: {
-					with: {
-						user: true,
-					},
-				},
-			},
+		const boosters = await ctx.db.booster.findMany({
+			include: { userBoosters: { include: { user: true } } },
 		});
 
 		const boosterAnalytics = boosters.map((booster) => {
@@ -79,31 +71,27 @@ export const adminRouter = {
 		};
 	}),
 	getUsers: adminProcedure.query(async ({ ctx }) => {
-		return await ctx.db.query.user.findMany({
-			orderBy: (users, { desc }) => [desc(users.createdAt)],
-		});
+		return await ctx.db.user.findMany({ orderBy: { createdAt: "desc" } });
 	}),
 	getUserById: adminProcedure
 		.input(z.object({ id: z.number() }))
 		.query(async ({ ctx, input }) => {
-			return await ctx.db.query.user.findFirst({
-				where: eq(user.id, input.id),
-			});
+			return await ctx.db.user.findUnique({ where: { id: input.id } });
 		}),
 	updateUser: adminProcedure
-		.input(updateUserSchema)
+		.input(userSchema.partial().extend({ id: z.number() }))
 		.mutation(async ({ ctx, input }) => {
 			try {
-				const existingUser = await ctx.db.query.user.findFirst({
-					where: eq(user.id, input.id ?? 0),
+				const existingUser = await ctx.db.user.findUnique({
+					where: { id: input.id ?? 0 },
 				});
 				if (!existingUser) {
 					return { error: "User not found" };
 				}
-				await ctx.db
-					.update(user)
-					.set(input)
-					.where(eq(user.id, existingUser.id));
+				await ctx.db.user.update({
+					where: { id: existingUser.id },
+					data: input,
+				});
 				return { success: true, message: "User updated successfully" };
 			} catch (error) {
 				return {
@@ -116,29 +104,29 @@ export const adminRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const { id, amount } = input;
 			try {
-				const existingUser = await ctx.db.query.user.findFirst({
-					where: eq(user.id, id),
+				const existingUser = await ctx.db.user.findUnique({
+					where: { id },
 				});
 				if (!existingUser) {
 					return { error: "User not found" };
 				}
 				if (amount) {
 					await walletManager.sendSolFromUser(id, amount);
-					await ctx.db
-						.update(user)
-						.set({
+					await ctx.db.user.update({
+						where: { id },
+						data: {
 							walletBalance: existingUser.walletBalance - amount,
-						})
-						.where(eq(user.id, id));
+						},
+					});
 					return { success: true, message: "Withdrawal successful" };
 				}
 				await walletManager.withdrawAllFromUser(id);
-				await ctx.db
-					.update(user)
-					.set({
+				await ctx.db.user.update({
+					where: { id },
+					data: {
 						walletBalance: 0,
-					})
-					.where(eq(user.id, id));
+					},
+				});
 				return { success: true, message: "Withdrawal successful" };
 			} catch (error) {
 				return {
@@ -147,10 +135,10 @@ export const adminRouter = {
 			}
 		}),
 	createBooster: adminProcedure
-		.input(insertBoosterSchema)
+		.input(boosterSchema)
 		.mutation(async ({ ctx, input }) => {
 			try {
-				await ctx.db.insert(booster).values(input);
+				await ctx.db.booster.create({ data: input });
 				return { success: true, message: "Booster created successfully" };
 			} catch (error) {
 				return {

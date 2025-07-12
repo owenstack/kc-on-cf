@@ -1,5 +1,15 @@
-import { env } from "cloudflare:workers";
-import { drizzle } from "drizzle-orm/d1";
-import * as schema from "./schema";
+import { PrismaClient } from "@prisma/client";
 
-export const db = drizzle(env.DATABASE, { schema });
+const prismaClientSingleton = () => {
+	return new PrismaClient();
+};
+
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
+
+const globalForPrisma = globalThis as unknown as {
+	prisma: PrismaClientSingleton | undefined;
+};
+
+export const db = globalForPrisma.prisma ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;

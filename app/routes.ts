@@ -1,9 +1,8 @@
-import { type RouteConfig, route } from "@react-router/dev/routes";
-import { flatRoutes } from "@react-router/fs-routes";
+import { index, type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
-	// route("api/preview/enable", "routes/api/preview/enable.ts"),
-	// route("api/preview/disable", "routes/api/preview/disable.ts"),
-	route("server/set-theme", "routes/server/set-theme.ts"),
-	...(await flatRoutes({})),
+	index("routes/index.tsx"),
+	route("/api/trpc/*", "routes/api/trpc.ts"),
+	route("settings", "routes/settings.tsx"),
+	route("admin", "routes/admin.tsx"),
 ] satisfies RouteConfig;

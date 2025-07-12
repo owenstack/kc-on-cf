@@ -1,4 +1,3 @@
-import { env } from "cloudflare:workers";
 import {
 	AuthDateInvalidError,
 	ExpiredError,
@@ -8,12 +7,11 @@ import {
 	validate,
 } from "@telegram-apps/init-data-node";
 import { initTRPC, TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import type { LoaderFunctionArgs } from "react-router";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "~/db";
-import { user } from "~/db/schema";
+import { env } from "~/lib/env";
 import { walletManager } from "~/lib/solana";
 
 export async function createContext({ headers }: { headers: Headers }) {
@@ -39,27 +37,25 @@ export async function createContext({ headers }: { headers: Headers }) {
 				message: "Invalid authentication data",
 			});
 		}
-		const existingUser = await db.query.user.findFirst({
-			where: eq(user.telegramId, initData.user.id),
+		const existingUser = await db.user.findUnique({
+			where: { telegramId: initData.user.id },
 		});
 		if (existingUser) {
-			const updatedUser = await db
-				.update(user)
-				.set({
+			const updatedUser = await db.user.update({
+				where: { telegramId: initData.user.id },
+				data: {
 					firstName: initData.user.first_name,
-					lastName: initData.user.last_name,
-					username: initData.user.username,
-					image: initData.user.photo_url ?? null,
-					updatedAt: new Date(),
-				})
-				.where(eq(user.id, existingUser.id))
-				.returning();
-			return { user: updatedUser[0], db };
+					lastName: initData.user.last_name || null,
+					username: initData.user.username || null,
+					image: initData.user.photo_url || null,
+				},
+			});
+			return { user: updatedUser, db };
 		}
 		const { publicKey } = walletManager.createUserWallet(initData.user.id);
-		const newUser = await db
-			.insert(user)
-			.values({
+		const newUser = await db.user.create({
+			data: {
+				id: initData.user.id,
 				telegramId: initData.user.id,
 				firstName: initData.user.first_name,
 				lastName: initData.user.last_name || null,
@@ -68,12 +64,9 @@ export async function createContext({ headers }: { headers: Headers }) {
 				publicKey,
 				role: "user",
 				balance: 0,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			})
-			.returning();
-
-		return { user: newUser[0], db };
+			},
+		});
+		return { user: newUser, db };
 	} catch (error) {
 		if (error instanceof ExpiredError) {
 			throw new TRPCError({
