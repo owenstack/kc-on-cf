@@ -14,5 +14,5 @@ export const env = createEnv({
 		WALLET_SECRET_PHRASE: z.string(),
 		DATABASE_URL: z.string().url(),
 	},
-	runtimeEnv: import.meta.env,
+	runtimeEnv: process.env,
 });
