@@ -4,7 +4,13 @@ import { protectedProcedure } from "../utils";
 
 export const boosterRouter = {
 	getAvailableBoosters: protectedProcedure.query(async ({ ctx }) => {
-		return await ctx.db.booster.findMany();
+		console.log("Entering getAvailableBoosters procedure");
+		try {
+			return await ctx.db.booster.findMany();
+		} catch (error) {
+			console.error("Error in getAvailableBoosters procedure:", error);
+			throw error;
+		}
 	}),
 	purchaseBooster: protectedProcedure
 		.input(
@@ -14,6 +20,7 @@ export const boosterRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			console.log("Entering purchaseBooster procedure with input:", input);
 			const { boosterId, externalPayment } = input;
 			const now = Date.now();
 			try {
@@ -21,6 +28,7 @@ export const boosterRouter = {
 					where: { id: boosterId },
 				});
 				if (!dbBooster) {
+					console.error("Booster not found in purchaseBooster procedure");
 					return { error: "Booster does not exist" };
 				}
 				const expiresAt =
@@ -74,6 +82,7 @@ export const boosterRouter = {
 				]);
 				return { success: true, message: "Booster purchased successfully" };
 			} catch (error) {
+				console.error("Error in purchaseBooster procedure:", error);
 				return {
 					error:
 						error instanceof Error ? error.message : "Internal server error",
