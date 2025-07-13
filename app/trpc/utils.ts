@@ -24,8 +24,8 @@ export async function createContext({ headers }: { headers: Headers }) {
 				message: "Invalid authentication type",
 			});
 		}
-		const token = import.meta.env.DEV ? env.DEV_BOT_TOKEN : env.PROD_BOT_TOKEN;
-		if (!import.meta.env.DEV) {
+		const token = process.env.NODE_ENV === 'development' ? env.DEV_BOT_TOKEN : env.PROD_BOT_TOKEN;
+		if (process.env.NODE_ENV !== 'development') {
 			validate(authData, token, {
 				expiresIn: 3600,
 			});

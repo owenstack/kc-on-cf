@@ -27,27 +27,20 @@ function getQueryClient() {
 }
 
 const getBaseUrl = () => {
-	if (typeof window !== "undefined") {
-		// Browser should use relative URL
-		return "";
-	}
-	if (import.meta.env.DEV) {
-		// Local dev on wrangler/localhost
-		return "http://localhost:8787";
-	}
-	// Fallback for SSR/Workers – let runtime set this
-	return undefined;
-};
+  if (typeof window !== 'undefined') return window.location.origin
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return `http://localhost:${process.env.PORT ?? 3000}`
+}
 
 const links = [
 	loggerLink({
 		enabled: (op) =>
-			import.meta.env.DEV ||
+			process.env.NODE_ENV === 'development' ||
 			(op.direction === "down" && op.result instanceof Error),
 	}),
 	httpBatchLink({
 		transformer: superjson,
-		url: getBaseUrl() ? `${getBaseUrl()}/api/trpc` : "/api/trpc",
+		url: `${getBaseUrl()}/api/trpc`,
 		headers() {
 			const headers = new Headers();
 			// Only try to get init data on client side

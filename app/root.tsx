@@ -86,7 +86,7 @@ export default function AppWithProviders() {
 					const lp = retrieveLaunchParams();
 					const debug =
 						(lp.tgWebAppStartParam || "").includes("platformer_debug") ||
-						import.meta.env.DEV;
+						process.env.NODE_ENV === 'development';
 					await init({
 						debug,
 						eruda: debug && ["ios", "android"].includes(telegramData.platform),
@@ -185,7 +185,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 			error.status === 404
 				? "The requested page could not be found."
 				: error.statusText || details;
-	} else if (import.meta.env.DEV && error && error instanceof Error) {
+	} else if (process.env.NODE_ENV === 'development' && error && error instanceof Error) {
 		details = error.message;
 		stack = error.stack;
 	}
