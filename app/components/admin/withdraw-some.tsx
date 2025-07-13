@@ -23,7 +23,7 @@ export function WithdrawSome({
 	userId,
 	balance,
 }: {
-	userId: number;
+	userId: string;
 	balance: number;
 }) {
 	const [open, setOpen] = useState(false);

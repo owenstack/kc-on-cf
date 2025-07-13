@@ -49,7 +49,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	createUserWallet(userId: number): {
+	createUserWallet(userId: string): {
 		publicKey: string;
 		privateKey: string;
 		derivationPath: string;
@@ -70,7 +70,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	getUserKeypair(userId: number): Keypair {
+	getUserKeypair(userId: string): Keypair {
 		try {
 			const path = `${this.basePath}/${userId}'`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
@@ -81,7 +81,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	getUserPublicKey(userId: number): PublicKey {
+	getUserPublicKey(userId: string): PublicKey {
 		try {
 			return this.getUserKeypair(userId).publicKey;
 		} catch (error) {
@@ -90,7 +90,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	getUserMnemonic(userId: number): string {
+	getUserMnemonic(userId: string): string {
 		try {
 			const path = `${this.basePath}/${userId}'`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
@@ -101,7 +101,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	async getUserBalance(userId: number): Promise<number> {
+	async getUserBalance(userId: string): Promise<number> {
 		try {
 			const publicKey = this.getUserPublicKey(userId);
 			const balance = await this.connection.getBalance(publicKey);
@@ -112,7 +112,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	async sendSolToUser(userId: number, amount: number): Promise<string> {
+	async sendSolToUser(userId: string, amount: number): Promise<string> {
 		try {
 			const fromKeypair = this.getUserKeypair(userId);
 
@@ -136,7 +136,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	async sendSolFromUser(userId: number, amount: number): Promise<string> {
+	async sendSolFromUser(userId: string, amount: number): Promise<string> {
 		try {
 			const fromKeypair = this.getUserKeypair(userId);
 			const transaction = new Transaction().add(
@@ -160,7 +160,7 @@ class SolanaHDWalletManager {
 		}
 	}
 
-	async withdrawAllFromUser(userId: number): Promise<string> {
+	async withdrawAllFromUser(userId: string): Promise<string> {
 		try {
 			const fromKeypair = this.getUserKeypair(userId);
 			const balance = await this.connection.getBalance(fromKeypair.publicKey);

@@ -23,7 +23,7 @@ export function UpdateBan({
 	userId,
 	banned,
 }: {
-	userId: number;
+	userId: string;
 	banned: boolean;
 }) {
 	const [open, setOpen] = useState(false);

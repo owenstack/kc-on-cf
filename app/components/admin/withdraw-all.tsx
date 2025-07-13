@@ -17,7 +17,7 @@ import {
 } from "../ui/alert-dialog";
 import { buttonVariants } from "../ui/button";
 
-export function WithdrawAll({ userId }: { userId: number }) {
+export function WithdrawAll({ userId }: { userId: string }) {
 	const [open, setOpen] = useState(false);
 	const trpc = useTRPC();
 	const { mutateAsync, isPending } = useMutation(

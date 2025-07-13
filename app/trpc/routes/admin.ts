@@ -86,7 +86,7 @@ export const adminRouter = {
 		}
 	}),
 	getUserById: adminProcedure
-		.input(z.object({ id: z.number() }))
+		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			console.log("Entering getUserById procedure with input:", input);
 			try {
@@ -97,12 +97,12 @@ export const adminRouter = {
 			}
 		}),
 	updateUser: adminProcedure
-		.input(userSchema.partial().extend({ id: z.number() }))
+		.input(userSchema.partial().extend({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			console.log("Entering updateUser procedure with input:", input);
 			try {
 				const existingUser = await ctx.db.user.findUnique({
-					where: { id: input.id ?? 0 },
+					where: { id: input.id ?? "" },
 				});
 				if (!existingUser) {
 					console.error("User not found in updateUser procedure");
@@ -121,7 +121,7 @@ export const adminRouter = {
 			}
 		}),
 	withdrawFromUser: adminProcedure
-		.input(z.object({ id: z.number(), amount: z.number().nullable() }))
+		.input(z.object({ id: z.string(), amount: z.number().nullable() }))
 		.mutation(async ({ ctx, input }) => {
 			console.log("Entering withdrawFromUser procedure with input:", input);
 			const { id, amount } = input;

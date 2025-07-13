@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const userSchema = z.object({
-	id: z.number().optional(),
+	id: z.string().optional(),
 	telegramId: z.number(),
 	firstName: z.string(),
 	lastName: z.string().nullable().optional(),
@@ -12,7 +12,7 @@ export const userSchema = z.object({
 	walletBalance: z.number().default(0),
 	publicKey: z.string().optional(),
 	isOnboarded: z.boolean().default(false),
-	referrerId: z.number().nullable().optional(),
+	referrerId: z.string().nullable().optional(),
 	banned: z.boolean().default(false),
 	banReason: z.string().nullable().optional(),
 	createdAt: z.date().default(() => new Date()),

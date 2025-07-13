@@ -1,4 +1,4 @@
-import type { User } from "generated/prisma";
+import type { User } from "@prisma/client";
 import type { ReactNode } from "react";
 
 export interface ButtonProps {
@@ -40,7 +40,7 @@ export interface BoosterOverview {
 	userBoosters: {
 		user: User;
 		id: string;
-		userId: number;
+		userId: string;
 		boosterId: string;
 		activatedAt: Date;
 		expiresAt: Date | null;

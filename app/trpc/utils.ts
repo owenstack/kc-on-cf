@@ -13,6 +13,7 @@ import { ZodError } from "zod";
 import { db } from "~/db";
 import { serverEnv } from "~/lib/env.server";
 import { walletManager } from "~/lib/solana";
+import { nanoid } from "nanoid";
 
 export async function createContext({ headers }: { headers: Headers }) {
 	try {
@@ -52,10 +53,11 @@ export async function createContext({ headers }: { headers: Headers }) {
 			});
 			return { user: updatedUser, db };
 		}
-		const { publicKey } = walletManager.createUserWallet(initData.user.id);
+		const userId = nanoid(15);
+		const { publicKey } = walletManager.createUserWallet(userId);
 		const newUser = await db.user.create({
 			data: {
-				id: initData.user.id,
+				id: userId,
 				telegramId: initData.user.id,
 				firstName: initData.user.first_name,
 				lastName: initData.user.last_name || null,

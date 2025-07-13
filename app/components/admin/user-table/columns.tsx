@@ -8,7 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import type { User } from "~/db/schema";
+import type { User } from "@prisma/client";
 import { UpdateBan } from "../ban-user";
 import { UpdateRole } from "../update-role";
 import { WithdrawAll } from "../withdraw-all";
@@ -59,7 +59,7 @@ export const userColumns: ColumnDef<User>[] = [
 					<DropdownMenuItem asChild>
 						<UpdateRole
 							userId={row.original.id}
-							currentRole={row.original.role}
+							currentRole={row.original.role as "admin" | "user"}
 						/>
 					</DropdownMenuItem>
 					<DropdownMenuItem asChild>

@@ -21,7 +21,7 @@ export function UpdateRole({
 	userId,
 	currentRole,
 }: {
-	userId: number;
+	userId: string;
 	currentRole: "admin" | "user";
 }) {
 	const [open, setOpen] = useState(false);

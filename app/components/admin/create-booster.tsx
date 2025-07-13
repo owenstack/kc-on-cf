@@ -32,8 +32,7 @@ export function CreateBoosterDialog() {
 		price: z.number().min(0, "Price must be a positive number"),
 		duration: z
 			.number()
-			.min(0, "Duration must be a positive number")
-			.optional(),
+			.min(0, "Duration must be a positive number"),
 		multiplier: z.number().min(1, "Multiplier must be at least 1"),
 		type: z.enum(["oneTime", "duration", "permanent"]),
 		id: z.string(),
