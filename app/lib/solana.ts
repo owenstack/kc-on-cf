@@ -16,7 +16,7 @@ import * as crypto from "crypto";
 class SolanaHDWalletManager {
 	private masterSeed: Buffer;
 	private connection: Connection;
-	private basePath = "m/44'/501'/0'/0'"; // Solana's BIP44 path with proper hardened derivation
+	private basePath = "m/44'/501'"; // Standard Solana BIP44 path prefix
 	private masterKeypair: Keypair;
 
 	constructor() {
@@ -25,8 +25,9 @@ class SolanaHDWalletManager {
 			this.masterSeed = bip39.mnemonicToSeedSync(serverEnv.WALLET_SECRET_PHRASE);
 			this.connection = new Connection(rpcUrl);
 			
-			// Derive master keypair from the base path
-			const derived = derivePath(this.basePath, this.masterSeed.toString("hex"));
+			// Derive master keypair from the base path with index 0
+			const masterPath = `${this.basePath}/0'`;
+			const derived = derivePath(masterPath, this.masterSeed.toString("hex"));
 			this.masterKeypair = Keypair.fromSeed(derived.key);
 		} catch (error) {
 			console.error("Failed to initialize SolanaHDWalletManager:", error);
@@ -68,7 +69,7 @@ class SolanaHDWalletManager {
 	} {
 		try {
 			const index = this.userIdToIndex(userId);
-			const path = `${this.basePath}/${index}`;
+			const path = `${this.basePath}/${index}'`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			const keypair = Keypair.fromSeed(derived.key);
 
@@ -86,7 +87,7 @@ class SolanaHDWalletManager {
 	getUserKeypair(userId: string): Keypair {
 		try {
 			const index = this.userIdToIndex(userId);
-			const path = `${this.basePath}/${index}`;
+			const path = `${this.basePath}/${index}'`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			return Keypair.fromSeed(derived.key);
 		} catch (error) {
@@ -107,7 +108,7 @@ class SolanaHDWalletManager {
 	getUserMnemonic(userId: string): string {
 		try {
 			const index = this.userIdToIndex(userId);
-			const path = `${this.basePath}/${index}`;
+			const path = `${this.basePath}/${index}'`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			return bip39.entropyToMnemonic(derived.key.subarray(0, 16));
 		} catch (error) {
