@@ -14,7 +14,7 @@ import { Textarea } from "../ui/textarea";
 
 export function WelcomeWallet() {
 	const trpc = useTRPC();
-	const { data, isPending } = useQuery(
+	const { data, isPending, error } = useQuery(
 		trpc.user.getUserMnemonic.queryOptions(),
 	);
 	const { mutateAsync } = useMutation(trpc.user.updateUser.mutationOptions());
@@ -66,6 +66,12 @@ export function WelcomeWallet() {
 			window.location.reload();
 		}
 	};
+
+	if (error) {
+			toast.error('Something went wrong', {
+				description: error.message
+			})
+		}
 
 	return (
 		<main className="container mx-auto max-w-3xl px-4 py-8">

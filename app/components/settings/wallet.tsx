@@ -25,10 +25,16 @@ import { Textarea } from "../ui/textarea";
 
 export function Wallet() {
 	const trpc = useTRPC();
-	const { data: publicKey, isPending } = useQuery({
+	const { data: publicKey, isPending, error } = useQuery({
 		...trpc.user.getUser.queryOptions(),
 		select: (data) => data.publicKey,
 	});
+
+	if (error) {
+		toast.error('Something went wrong', {
+			description: error.message
+		})
+	}
 
 	return (
 		<Card className="w-full max-w-sm">

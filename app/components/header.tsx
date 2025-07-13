@@ -14,10 +14,11 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Skeleton } from "./ui/skeleton";
+import { toast } from "sonner";
 
 export function Header() {
 	const trpc = useTRPC();
-	const { data, isPending } = useQuery(trpc.user.getUser.queryOptions());
+	const { data, isPending, error } = useQuery(trpc.user.getUser.queryOptions());
 	const tgData = useSignal(initDataState);
 	const user = tgData?.user;
 
@@ -35,7 +36,11 @@ export function Header() {
 	// }
 
 	const userProfileImage = user?.photo_url;
-
+if (error) {
+		toast.error('Something went wrong', {
+			description: error.message
+		})
+	}
 	return (
 		<header className="bg-card border-b border-border shadow-sm top-0 z-20">
 			<div className="max-w-7x; mx-auto px-4 lg:px-8">

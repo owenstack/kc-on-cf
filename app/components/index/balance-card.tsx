@@ -14,15 +14,22 @@ import {
 import { Skeleton } from "../ui/skeleton";
 import { Deposit } from "./deposit-dialog";
 import { Withdraw } from "./withdraw-dialog";
+import { toast } from "sonner";
 
 export function BalanceCard() {
 	const trpc = useTRPC();
-	const { data, refetch, isRefetching, isPending } = useQuery({
+	const { data, refetch, isRefetching, isPending, error } = useQuery({
 		...trpc.user.getUser.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
 		select: (data) => data.balance ?? 0,
 	});
+
+	if (error) {
+		toast.error('Something went wrong', {
+			description: error.message
+		})
+	}
 
 	return (
 		<Card className="w-full mt-4 max-w-sm md:max-w-md">

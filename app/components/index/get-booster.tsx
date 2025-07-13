@@ -22,7 +22,7 @@ export function PurchaseBooster({ booster }: { booster: Booster }) {
 	const { mutateAsync: sendTransaction } = useMutation(
 		trpc.user.payBySolBalance.mutationOptions(),
 	);
-	const { data, refetch } = useQuery({
+	const { data, refetch, error } = useQuery({
 		...trpc.user.getUser.queryOptions(),
 		select: (data) => {
 			return {
@@ -30,6 +30,13 @@ export function PurchaseBooster({ booster }: { booster: Booster }) {
 			};
 		},
 	});
+
+	if (error) {
+			toast.error('Something went wrong', {
+				description: error.message
+			})
+		}
+		
 	const { mutateAsync: purchaseBooster } = useMutation(
 		trpc.booster.purchaseBooster.mutationOptions(),
 	);

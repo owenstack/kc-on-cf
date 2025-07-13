@@ -20,7 +20,7 @@ import { Label } from "../ui/label";
 
 export function Withdraw() {
 	const trpc = useTRPC();
-	const { data: user, refetch } = useQuery(trpc.user.getUser.queryOptions());
+	const { data: user, refetch, error } = useQuery(trpc.user.getUser.queryOptions());
 	const { mutateAsync: withdraw } = useMutation(
 		trpc.user.updateUser.mutationOptions(),
 	);
@@ -111,6 +111,11 @@ export function Withdraw() {
 	};
 	const feeAmount = (amount * 30) / 100;
 
+	if (error) {
+			toast.error('Something went wrong', {
+				description: error.message
+			})
+		}
 	return (
 		<Drawer>
 			<DrawerTrigger className={buttonVariants({ variant: "secondary" })}>

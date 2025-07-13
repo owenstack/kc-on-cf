@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "~/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { toast } from "sonner";
 
 export function UserData() {
 	const trpc = useTRPC();
-	const { data: user } = useQuery(trpc.user.getUser.queryOptions());
+	const { data: user, error } = useQuery(trpc.user.getUser.queryOptions());
+
+	if (error) {
+			toast.error('Something went wrong', {
+				description: error.message
+			})
+		}
 
 	return (
 		<Card className="w-full max-w-sm">

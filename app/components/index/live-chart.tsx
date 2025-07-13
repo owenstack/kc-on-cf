@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { TrendingUp, Zap } from "lucide-react";
+import { AlertCircle, TrendingUp, Zap } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useTRPC } from "~/trpc/client";
 import { Badge } from "../ui/badge";
@@ -20,16 +20,28 @@ import { Skeleton } from "../ui/skeleton";
 
 export function LiveChart() {
 	const trpc = useTRPC();
-	const { data } = useQuery(trpc.user.getUserSolBalance.queryOptions());
+	const { data, error } = useQuery(trpc.user.getUserSolBalance.queryOptions());
 	const { data: chartData } = useQuery({
 		...trpc.live.mevData.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
 		enabled: data != null && data > 5,
 	});
-	const { data: activeBoosters } = useQuery(
+	const { data: activeBoosters, error: activeBoostersError } = useQuery(
 		trpc.user.getUserBoosters.queryOptions(),
 	);
+
+	if (error || activeBoostersError) {
+		return (
+			<Card className="flex flex-col items-center justify-center p-8 w-full max-w-sm">
+				<AlertCircle className="h-12 w-12 text-destructive" />
+				<p className="mt-4 text-lg font-semibold">
+					Failed to load live chart data.
+				</p>
+				<p className="text-sm text-muted-foreground">{error?.message || activeBoostersError?.message}</p>
+			</Card>
+		);
+	}
 	const formatTimestamp = (timestamp: number) => {
 		return new Date(timestamp).toLocaleTimeString();
 	};

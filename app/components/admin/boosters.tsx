@@ -6,6 +6,7 @@ import { Skeleton } from "../ui/skeleton";
 import { TopBoostersChart } from "./booster-chart";
 import { AllBoostersTable } from "./booster-table";
 import { KeyMetrics } from "./key-metrics";
+import type { BoosterOverview } from "~/lib/constants";
 
 export function AdminBooster() {
 	const trpc = useTRPC();
@@ -41,10 +42,10 @@ export function AdminBooster() {
 					averageBoosterPrice={data.averageBoosterPrice}
 				/>
 				{/* Section 2: Top Performing Chart */}
-				<TopBoostersChart topPurchased={data.topPurchased} />
+				<TopBoostersChart topPurchased={data.topPurchased as BoosterOverview[]} />
 
 				{/* Section 3: Scrollable Table */}
-				<AllBoostersTable allBoosters={data.allBoosters} />
+				<AllBoostersTable allBoosters={data.allBoosters as BoosterOverview[]} />
 			</CardContent>
 		</Card>
 	);

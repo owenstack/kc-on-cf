@@ -26,11 +26,18 @@ export function Deposit() {
 		data,
 		refetch,
 		isPending: loading,
+		error
 	} = useQuery(trpc.user.getUserSolBalance.queryOptions());
-	const { data: publicKey, isPending } = useQuery({
+	const { data: publicKey, isPending, error: publicKeyError } = useQuery({
 		...trpc.user.getUser.queryOptions(),
 		select: (data) => data.publicKey,
 	});
+
+	if (error || publicKeyError) {
+		toast.error('Something went wrong', {
+			description: error?.message || publicKeyError?.message
+		})
+	}
 
 	useEffect(() => {
 		if (data) {

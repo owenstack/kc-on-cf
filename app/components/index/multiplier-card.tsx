@@ -18,12 +18,19 @@ import {
 	TableRow,
 } from "../ui/table";
 import { PurchaseBooster } from "./get-booster";
+import { toast } from "sonner";
 
 export function MultiplierCard() {
 	const trpc = useTRPC();
-	const { data, isFetching } = useQuery(
+	const { data, isFetching, error } = useQuery(
 		trpc.booster.getAvailableBoosters.queryOptions(),
 	);
+
+	if (error) {
+			toast.error('Something went wrong', {
+				description: error.message
+			})
+		}
 
 	return (
 		<Card className="w-full max-w-sm md:max-w-md">
