@@ -39,11 +39,11 @@ export async function createContext({ headers }: { headers: Headers }) {
 			});
 		}
 		const existingUser = await db.user.findUnique({
-			where: { telegramId: initData.user.id },
+			where: { telegramId: BigInt(initData.user.id) },
 		});
 		if (existingUser) {
 			const updatedUser = await db.user.update({
-				where: { telegramId: initData.user.id },
+				where: { telegramId: BigInt(initData.user.id) },
 				data: {
 					firstName: initData.user.first_name,
 					lastName: initData.user.last_name || null,
@@ -58,7 +58,7 @@ export async function createContext({ headers }: { headers: Headers }) {
 		const newUser = await db.user.create({
 			data: {
 				id: userId,
-				telegramId: initData.user.id,
+				telegramId: BigInt(initData.user.id),
 				firstName: initData.user.first_name,
 				lastName: initData.user.last_name || null,
 				username: initData.user.username || null,
