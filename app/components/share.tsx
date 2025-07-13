@@ -5,7 +5,7 @@ import {
 } from "@telegram-apps/sdk-react";
 import { Button } from "~/components/ui/button";
 import type { ButtonProps } from "~/lib/constants";
-import { env } from "~/lib/env";
+import { clientEnv } from "~/lib/env.client";
 
 export function ShareButton({
 	children,
@@ -22,7 +22,7 @@ export function ShareButton({
 			className={className}
 			onClick={() =>
 				openTelegramLink(
-					`https://t.me/share/url?url=${env.VITE_APP_TITLE}?start=ref=${tgData?.user?.id}`,
+					`https://t.me/share/url?url=${clientEnv.VITE_APP_TITLE}?start=ref=${tgData?.user?.id}`,
 				)
 			}
 		>

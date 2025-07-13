@@ -11,7 +11,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "~/db";
-import { env } from "~/lib/env";
+import { serverEnv } from "~/lib/env.server";
 import { walletManager } from "~/lib/solana";
 
 export async function createContext({ headers }: { headers: Headers }) {
@@ -24,7 +24,7 @@ export async function createContext({ headers }: { headers: Headers }) {
 				message: "Invalid authentication type",
 			});
 		}
-		const token = process.env.NODE_ENV === 'development' ? env.DEV_BOT_TOKEN : env.PROD_BOT_TOKEN;
+		const token = process.env.NODE_ENV === 'development' ? serverEnv.DEV_BOT_TOKEN : serverEnv.PROD_BOT_TOKEN;
 		if (process.env.NODE_ENV !== 'development') {
 			validate(authData, token, {
 				expiresIn: 3600,
