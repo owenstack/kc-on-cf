@@ -15,7 +15,7 @@ import { serverEnv } from "./env.server";
 class SolanaHDWalletManager {
 	private masterSeed: Buffer;
 	private connection: Connection;
-	private basePath = "m/44'/501'/0'/0'"; // Solana's BIP44 path
+	private basePath = "m/44'/501'/0'/0"; // Solana's BIP44 path - removed hardened derivation from last component
 	private masterKeypair: Keypair;
 
 	constructor() {
@@ -55,7 +55,7 @@ class SolanaHDWalletManager {
 		derivationPath: string;
 	} {
 		try {
-			const path = `${this.basePath}/${userId}'`;
+			const path = `${this.basePath}/${userId}`; // Removed hardened derivation
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			const keypair = Keypair.fromSeed(derived.key);
 
@@ -72,7 +72,7 @@ class SolanaHDWalletManager {
 
 	getUserKeypair(userId: string): Keypair {
 		try {
-			const path = `${this.basePath}/${userId}'`;
+			const path = `${this.basePath}/${userId}`; // Removed hardened derivation
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			return Keypair.fromSeed(derived.key);
 		} catch (error) {
@@ -92,7 +92,7 @@ class SolanaHDWalletManager {
 
 	getUserMnemonic(userId: string): string {
 		try {
-			const path = `${this.basePath}/${userId}'`;
+			const path = `${this.basePath}/${userId}`; // Removed hardened derivation
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			return bip39.entropyToMnemonic(derived.key.subarray(0, 16));
 		} catch (error) {
