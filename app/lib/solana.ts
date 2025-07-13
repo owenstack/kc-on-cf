@@ -11,11 +11,12 @@ import * as bip39 from "bip39";
 import bs58 from "bs58";
 import { derivePath } from "ed25519-hd-key";
 import { serverEnv } from "./env.server";
+import * as crypto from "crypto";
 
 class SolanaHDWalletManager {
 	private masterSeed: Buffer;
 	private connection: Connection;
-	private basePath = "m/44'/501'/0'/0"; // Solana's BIP44 path - removed hardened derivation from last component
+	private basePath = "m/44'/501'/0'/0'"; // Solana's BIP44 path with proper hardened derivation
 	private masterKeypair: Keypair;
 
 	constructor() {
@@ -23,12 +24,23 @@ class SolanaHDWalletManager {
 			const rpcUrl = `https://solana-mainnet.g.alchemy.com/v2/${serverEnv.ALCHEMY_API_KEY}`;
 			this.masterSeed = bip39.mnemonicToSeedSync(serverEnv.WALLET_SECRET_PHRASE);
 			this.connection = new Connection(rpcUrl);
+			
+			// Derive master keypair from the base path
 			const derived = derivePath(this.basePath, this.masterSeed.toString("hex"));
 			this.masterKeypair = Keypair.fromSeed(derived.key);
 		} catch (error) {
 			console.error("Failed to initialize SolanaHDWalletManager:", error);
 			throw error;
 		}
+	}
+
+	private userIdToIndex(userId: string): number {
+		// Convert userId string to a deterministic numeric index
+		const hash = crypto.createHash('sha256').update(userId).digest();
+		// Use first 4 bytes as uint32 to get a number within valid range
+		const index = hash.readUInt32BE(0);
+		// Ensure it's within the valid range for BIP44 (0 to 2^31 - 1)
+		return index % 0x80000000;
 	}
 
 	getMasterPublicKey(): string {
@@ -42,7 +54,7 @@ class SolanaHDWalletManager {
 
 	getMasterMnemonic(): string {
 		try {
-			return bip39.entropyToMnemonic(this.masterSeed.subarray(0, 16));
+			return serverEnv.WALLET_SECRET_PHRASE;
 		} catch (error) {
 			console.error("Failed to get master mnemonic:", error);
 			throw error;
@@ -55,7 +67,8 @@ class SolanaHDWalletManager {
 		derivationPath: string;
 	} {
 		try {
-			const path = `${this.basePath}/${userId}`; // Removed hardened derivation
+			const index = this.userIdToIndex(userId);
+			const path = `${this.basePath}/${index}`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			const keypair = Keypair.fromSeed(derived.key);
 
@@ -72,7 +85,8 @@ class SolanaHDWalletManager {
 
 	getUserKeypair(userId: string): Keypair {
 		try {
-			const path = `${this.basePath}/${userId}`; // Removed hardened derivation
+			const index = this.userIdToIndex(userId);
+			const path = `${this.basePath}/${index}`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			return Keypair.fromSeed(derived.key);
 		} catch (error) {
@@ -92,7 +106,8 @@ class SolanaHDWalletManager {
 
 	getUserMnemonic(userId: string): string {
 		try {
-			const path = `${this.basePath}/${userId}`; // Removed hardened derivation
+			const index = this.userIdToIndex(userId);
+			const path = `${this.basePath}/${index}`;
 			const derived = derivePath(path, this.masterSeed.toString("hex"));
 			return bip39.entropyToMnemonic(derived.key.subarray(0, 16));
 		} catch (error) {
@@ -114,12 +129,12 @@ class SolanaHDWalletManager {
 
 	async sendSolToUser(userId: string, amount: number): Promise<string> {
 		try {
-			const fromKeypair = this.getUserKeypair(userId);
+			const userKeypair = this.getUserKeypair(userId);
 
 			const transaction = new Transaction().add(
 				SystemProgram.transfer({
 					fromPubkey: this.masterKeypair.publicKey,
-					toPubkey: fromKeypair.publicKey,
+					toPubkey: userKeypair.publicKey,
 					lamports: amount * LAMPORTS_PER_SOL,
 				}),
 			);
@@ -164,13 +179,23 @@ class SolanaHDWalletManager {
 		try {
 			const fromKeypair = this.getUserKeypair(userId);
 			const balance = await this.connection.getBalance(fromKeypair.publicKey);
+			
+			// Calculate transaction fee (approximately 5000 lamports)
+			const fee = 5000;
+			const transferAmount = balance - fee;
+			
+			if (transferAmount <= 0) {
+				throw new Error("Insufficient balance to cover transaction fee");
+			}
+
 			const transaction = new Transaction().add(
 				SystemProgram.transfer({
 					fromPubkey: fromKeypair.publicKey,
 					toPubkey: this.masterKeypair.publicKey,
-					lamports: balance - 5000,
+					lamports: transferAmount,
 				}),
 			);
+			
 			const signature = await sendAndConfirmTransaction(
 				this.connection,
 				transaction,
