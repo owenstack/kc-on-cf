@@ -36,7 +36,9 @@ export function BalanceCard() {
 		if (data !== undefined && data.balance <= 5) {
 			toast.error("You need at least 5 SOL to mine", {
 				description: "Press this button to copy your wallet address",
-				action: <Button onClick={() => copyTextToClipboard(data.publicKey)}>Copy</Button>
+				action: <Button onClick={() => {copyTextToClipboard(data.publicKey)
+					toast.success("Copied to clipboard")
+				}}>Copy</Button>
 			});
 			return;
 		}

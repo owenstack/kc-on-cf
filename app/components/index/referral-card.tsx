@@ -11,6 +11,7 @@ import {
 } from "../ui/card";
 import { copyTextToClipboard } from "@telegram-apps/sdk-react";
 import { Input } from "../ui/input";
+import { toast } from "sonner";
 
 export function ReferralCard() {
 	const trpc = useTRPC();
@@ -24,11 +25,12 @@ export function ReferralCard() {
 	const handleCopy = () => {
 		if (referralLink) {
 			copyTextToClipboard(referralLink);
+			toast.success("Referral link copied to clipboard")
 		}
 	};
 
 	return (
-		<Card>
+		<Card className="w-full max-w-sm md:max-w-md">
 			<CardHeader>
 				<CardTitle>Referrals</CardTitle>
 				<CardDescription>
@@ -39,7 +41,7 @@ export function ReferralCard() {
 				<div className="flex items-center gap-2">
 					<Input
 						type="text"
-						value={referralLink ?? ""}
+						defaultValue={referralLink ?? ""}
 						readOnly
 						className="font-mono text-sm"
 					/>
