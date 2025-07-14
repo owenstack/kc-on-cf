@@ -1,11 +1,10 @@
 import {
-	initDataState,
 	openTelegramLink,
-	useSignal,
 } from "@telegram-apps/sdk-react";
 import { Button } from "~/components/ui/button";
 import type { ButtonProps } from "~/lib/constants";
-import { clientEnv } from "~/lib/env.client";
+import { useQuery } from "@tanstack/react-query";
+import { useTRPC } from "~/trpc/client";
 
 export function ShareButton({
 	children,
@@ -13,7 +12,8 @@ export function ShareButton({
 	size = "default",
 	className,
 }: ButtonProps) {
-	const tgData = useSignal(initDataState);
+	const trpc = useTRPC();
+	const {data} = useQuery(trpc.user.getReferralLink.queryOptions())
 
 	return (
 		<Button
@@ -22,7 +22,7 @@ export function ShareButton({
 			className={className}
 			onClick={() =>
 				openTelegramLink(
-					`https://t.me/share/url?url=${clientEnv.VITE_APP_TITLE}?start=ref=${tgData?.user?.id}`,
+					`https://t.me/share/url?url=${data}`,
 				)
 			}
 		>

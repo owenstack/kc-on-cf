@@ -9,6 +9,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "../ui/card";
+import { copyTextToClipboard } from "@telegram-apps/sdk-react";
+import { Input } from "../ui/input";
 
 export function ReferralCard() {
 	const trpc = useTRPC();
@@ -21,7 +23,7 @@ export function ReferralCard() {
 
 	const handleCopy = () => {
 		if (referralLink) {
-			navigator.clipboard.writeText(referralLink);
+			copyTextToClipboard(referralLink);
 		}
 	};
 
@@ -35,11 +37,11 @@ export function ReferralCard() {
 			</CardHeader>
 			<CardContent>
 				<div className="flex items-center gap-2">
-					<input
+					<Input
 						type="text"
 						value={referralLink ?? ""}
 						readOnly
-						className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+						className="font-mono text-sm"
 					/>
 					<Button size="icon" onClick={handleCopy}>
 						<Copy className="h-4 w-4" />
