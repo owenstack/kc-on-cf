@@ -133,5 +133,10 @@ export const userRouter = {
 		}),
 		getReferralCount: protectedProcedure.query(async ({ctx}) => {
 			return await ctx.db.user.count({where: {referrerId: ctx.user.id}})
-		})
+		}),
+	getReferralLink: protectedProcedure.query(({ ctx }) => {
+		const url = new URL(ctx.headers.get("origin") ?? "");
+		url.searchParams.set("ref", ctx.user.id);
+		return url.toString();
+	}),
 } satisfies TRPCRouterRecord;

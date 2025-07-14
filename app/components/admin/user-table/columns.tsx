@@ -51,6 +51,10 @@ export const userColumns: ColumnDef<User>[] = [
 		cell: ({ row }) => `${row.original.walletBalance.toFixed(2)} SOL`,
 	},
 	{
+		accessorKey: "referralCount",
+		header: "Referrals",
+	},
+	{
 		id: "actions",
 		cell: ({ row }) => (
 			<DropdownMenu>
