@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Pickaxe, RefreshCw } from "lucide-react";
+import {  RefreshCw } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useTRPC } from "~/trpc/client";
 import { Dollar } from "../dollar";
@@ -76,11 +76,11 @@ export function BalanceCard() {
 					</CardDescription>
 				</div>
 				<CardAction className="flex flex-col gap-2 items-end">
-					<Withdraw />
-					<Deposit />
 					<Button variant={'outline'} onClick={handleMine} disabled={isPending || isRefetching}>
-						<Pickaxe /> Mine
+						Start MEV
 					</Button>
+					<Deposit />
+					<Withdraw />
 				</CardAction>
 			</CardHeader>
 		</Card>

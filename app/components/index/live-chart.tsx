@@ -52,7 +52,7 @@ export function LiveChart() {
 
 	const placeholderData = Array.from({ length: 10 }, (_, i) => ({
 		timestamp: Date.now() - (9 - i) * 1000 * 60,
-		value: Math.sin(i * 0.5) * 0.5 + 1
+		value: 1.0
 	}));
 
 	const displayData = chartData || placeholderData;
