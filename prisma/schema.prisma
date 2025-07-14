@@ -30,6 +30,7 @@ model User {
   banned        Boolean   @default(false)
   banReason     String?   @map("ban_reason")
   banExpires    DateTime? @map("ban_expires")
+  referralCount Int       @default(0) @map("referral_count")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 

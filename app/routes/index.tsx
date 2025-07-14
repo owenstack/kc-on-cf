@@ -5,6 +5,7 @@ import {
 } from "~/components/index/balance-card";
 import { LiveChart, LiveChartSkeleton } from "~/components/index/live-chart";
 import { MultiplierCard } from "~/components/index/multiplier-card";
+import { ReferralCard } from "~/components/index/referral-card";
 import { WelcomeWallet } from "~/components/welcome/wallet";
 import { useTRPC } from "~/trpc/client";
 
@@ -31,6 +32,7 @@ export default function Index() {
 					<BalanceCard />
 					<LiveChart />
 					<MultiplierCard />
+					<ReferralCard />
 				</>
 			)}
 		</main>
