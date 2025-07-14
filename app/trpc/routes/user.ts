@@ -131,4 +131,7 @@ export const userRouter = {
 				};
 			}
 		}),
+		getReferralCount: protectedProcedure.query(async ({ctx}) => {
+			return await ctx.db.user.count({where: {referrerId: ctx.user.id}})
+		})
 } satisfies TRPCRouterRecord;

@@ -25,7 +25,7 @@ export function LiveChart() {
 		...trpc.live.mevData.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
-		enabled: data != null && data > 5,
+		enabled: data != null && data >= 5,
 	});
 	const { data: activeBoosters, error: activeBoostersError } = useQuery(
 		trpc.user.getUserBoosters.queryOptions(),
@@ -50,6 +50,13 @@ export function LiveChart() {
 		return `${value.toFixed(2)}`;
 	};
 
+	const placeholderData = Array.from({ length: 10 }, (_, i) => ({
+		timestamp: Date.now() - (9 - i) * 1000 * 60,
+		value: Math.sin(i * 0.5) * 0.5 + 1
+	}));
+
+	const displayData = chartData || placeholderData;
+
 	return (
 		<Card className="h-[22rem] max-w-sm md:max-w-md md:h-[400px] mt-4 w-full">
 			<CardHeader>
@@ -70,7 +77,7 @@ export function LiveChart() {
 				<ChartContainer config={chartConfig}>
 					<AreaChart
 						accessibilityLayer
-						data={chartData}
+						data={displayData}
 						margin={{
 							top: 10,
 							right: 30,

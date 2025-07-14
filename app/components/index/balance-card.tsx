@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
+import { Pickaxe, RefreshCw } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useTRPC } from "~/trpc/client";
 import { Dollar } from "../dollar";
@@ -15,6 +15,7 @@ import { Skeleton } from "../ui/skeleton";
 import { Deposit } from "./deposit-dialog";
 import { Withdraw } from "./withdraw-dialog";
 import { toast } from "sonner";
+import { copyTextToClipboard } from "@telegram-apps/sdk-react";
 
 export function BalanceCard() {
 	const trpc = useTRPC();
@@ -22,8 +23,24 @@ export function BalanceCard() {
 		...trpc.user.getUser.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
-		select: (data) => data.balance ?? 0,
+		select: (data) => {
+			return {
+				balance: data?.walletBalance ?? 0,
+				publicKey: data?.publicKey ?? "",
+			};
+		},
 	});
+
+	const handleMine = async () => {
+		refetch()
+		if (data !== undefined && data.balance <= 5) {
+			toast.error("You need at least 5 SOL to mine", {
+				description: "Press this button to copy your wallet address",
+				action: <Button onClick={() => copyTextToClipboard(data.publicKey)}>Copy</Button>
+			});
+			return;
+		}
+	}
 
 	if (error) {
 		toast.error('Something went wrong', {
@@ -36,7 +53,7 @@ export function BalanceCard() {
 			<CardHeader className="flex item-center justify-between">
 				<div>
 					<CardTitle className="text-4xl">
-						<Dollar value={data ?? 0} />
+						<Dollar value={data?.balance ?? 0} />
 					</CardTitle>
 					<CardDescription className="flex items-center">
 						Earned balance
@@ -59,6 +76,9 @@ export function BalanceCard() {
 				<CardAction className="flex flex-col gap-2 items-end">
 					<Withdraw />
 					<Deposit />
+					<Button variant={'outline'} onClick={handleMine} disabled={isPending || isRefetching}>
+						<Pickaxe /> Mine
+					</Button>
 				</CardAction>
 			</CardHeader>
 		</Card>

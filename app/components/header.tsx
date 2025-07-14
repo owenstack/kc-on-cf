@@ -15,6 +15,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Skeleton } from "./ui/skeleton";
 import { toast } from "sonner";
+import { Cog } from "lucide-react";
 
 export function Header() {
 	const trpc = useTRPC();
@@ -58,51 +59,19 @@ if (error) {
 						) : user ? (
 							<div className="flex items-center space-x-3">
 								<div className="flex items-center space-x-2">
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Avatar className="size-10 hover:cursor-pointer">
+									<Avatar className="size-10 hover:cursor-pointer">
 												<AvatarImage src={userProfileImage} alt="User Avatar" />
 												<AvatarFallback>
 													{displayUser.firstName[0].toUpperCase()}
 												</AvatarFallback>
 											</Avatar>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent align="end">
-											<div className="flex items-center justify-start gap-2 p-2">
-												<div className="flex flex-col space-y-1 leading-none">
-													{displayUser.firstName && (
-														<p className="font-medium">
-															{displayUser.firstName}
-														</p>
-													)}
-													{displayUser.username && (
-														<p className="w-[200px] truncate text-sm text-muted-foreground">
-															@{displayUser.username}
-														</p>
-													)}
-												</div>
-											</div>
-											<DropdownMenuSeparator />
-											<DropdownMenuItem asChild>
-												<Link
-													to="/settings"
-													className="flex w-full items-center gap-2 text-sm"
-												>
-													<Settings className="size-4" />
-													Settings
-												</Link>
-											</DropdownMenuItem>
-											<DropdownMenuItem asChild>
-												<ShareButton
-													variant="secondary"
-													className="w-full gap-2 text-sm"
-												>
-													<Share2 className="size-4" /> Share
-												</ShareButton>
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
 								</div>
+								<ShareButton>
+									<Share2 />
+								</ShareButton>
+								<Link to='/settings'>
+								<Settings />
+								</Link>
 							</div>
 						) : (
 							<Skeleton className="w-10 h-10 rounded-full" />
