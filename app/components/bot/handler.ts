@@ -13,7 +13,7 @@ export function createBotHandler() {
 			[
 				{
 					text: "Open Galaxy MEV",
-					web_app: { url: `https://${process.env.VERCEL_URL}` },
+					web_app: { url: `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` },
 				},
 			],
 			[
@@ -45,8 +45,9 @@ export function createBotHandler() {
         const trpc = await botCaller(ctx.from);
         const user = await trpc.user.getUser()
 		await ctx.reply(
-			"Here is your generated wallet address:\n\n" +
-				`${user.publicKey}\n` +
+				`${user.publicKey}\n`)
+		await ctx.reply(
+			"Above is your generated wallet address:\n\n" +
 				"Copy this address and fund it through your preferred wallet\n\n" +
 				"Once completed, click the button below to confirm your deposit.",
 			keyboard,

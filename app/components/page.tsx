@@ -1,24 +1,37 @@
 import { useNavigate } from 'react-router';
-import { hideBackButton, onBackButtonClick, showBackButton } from '@telegram-apps/sdk-react';
-import { type PropsWithChildren, useEffect } from 'react';
+import {
+  hideBackButton,
+  onBackButtonClick,
+  showBackButton,
+} from '@telegram-apps/sdk-react';
+import type { PropsWithChildren } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export function PageWrapper({ children, back = true }: PropsWithChildren<{
-  /**
-   * True if it is allowed to go back from this page.
-   */
-  back?: boolean
-}>) {
+export function PageWrapper({
+  children,
+  back = true,
+}: PropsWithChildren<{ back?: boolean }>) {
   const navigate = useNavigate();
-
+  const [isClient, setIsClient] = useState(false);
   useEffect(() => {
-    if (back) {
-      showBackButton();
-      return onBackButtonClick(() => {
-        navigate(-1);
-      });
-    }
-    hideBackButton();
-  }, [back]);
+    setIsClient(true);
+  }, []);
 
+  const detachRef = useRef<VoidFunction | null>(null);
+  useEffect(() => {
+    if (!isClient) return;
+    if (!back) {
+      hideBackButton();
+      return;
+    }
+
+    showBackButton();
+    detachRef.current = onBackButtonClick(() => navigate(-1));
+
+    return () => {
+      detachRef.current?.();
+      hideBackButton();
+    };
+  }, [back, navigate, isClient]);
   return <>{children}</>;
 }

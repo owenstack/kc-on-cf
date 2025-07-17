@@ -135,7 +135,7 @@ export const userRouter = {
 			return await ctx.db.user.count({where: {referrerId: ctx.user.id}})
 		}),
 	getReferralLink: protectedProcedure.query(({ ctx }) => {
-		const url = new URL(`https://${process.env.VERCEL_URL}`);
+		const url = new URL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
 		url.searchParams.set("ref", ctx.user.id);
 		return url.toString();
 	}),
