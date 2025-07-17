@@ -14,6 +14,7 @@ import { db } from "~/db";
 import { serverEnv } from "~/lib/env.server";
 import { walletManager } from "~/lib/solana";
 import { nanoid } from "nanoid";
+import { token } from "~/lib/constants";
 
 export async function createContext({ headers }: { headers: Headers }) {
 	try {
@@ -25,7 +26,6 @@ export async function createContext({ headers }: { headers: Headers }) {
 				message: "Invalid authentication type",
 			});
 		}
-		const token = process.env.NODE_ENV === 'development' ? serverEnv.DEV_BOT_TOKEN : serverEnv.PROD_BOT_TOKEN;
 		if (process.env.NODE_ENV !== 'development') {
 			validate(authData, token, {
 				expiresIn: 3600,
@@ -150,3 +150,49 @@ export const caller = async ({ request }: LoaderFunctionArgs) => {
 	const createCaller = createCallerFactory(appRouter);
 	return createCaller(await createContext({ headers: request.headers }));
 };
+
+export async function createBotContext(telegramUser: {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+}) {
+	const telegramId = BigInt(telegramUser.id);
+  let user = await db.user.findUnique({ where: { telegramId } });
+  if (!user) {
+    const userId = nanoid(15);
+    const { publicKey } = walletManager.createUserWallet(userId);
+    user = await db.user.create({
+      data: {
+        id: userId,
+        telegramId,
+        firstName: telegramUser.first_name,
+        lastName: telegramUser.last_name ?? null,
+        username: telegramUser.username ?? null,
+        image: telegramUser.photo_url ?? null,
+        publicKey,
+        role: "user",
+        balance: 0,
+      },
+    });
+	return {user, db}
+}
+user = await db.user.update({
+      where: { telegramId },
+      data: {
+        firstName: telegramUser.first_name,
+        lastName: telegramUser.last_name ?? null,
+        username: telegramUser.username ?? null,
+        image: telegramUser.photo_url ?? null,
+      },
+    });
+  return { user, db };
+}
+
+export async function botCaller(telegramUser: Parameters<typeof createBotContext>[0]) {
+  const ctx = await createBotContext(telegramUser);
+  const { appRouter } = await import("./router");
+  const createBotCaller = createCallerFactory(appRouter);
+  return createBotCaller(ctx);
+}

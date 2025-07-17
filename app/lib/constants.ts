@@ -1,5 +1,6 @@
 import type { User } from "@prisma/client";
 import type { ReactNode } from "react";
+import { serverEnv } from "./env.server";
 
 export interface ButtonProps {
 	variant?:
@@ -48,3 +49,36 @@ export interface BoosterOverview {
 		updatedAt: Date;
 	}[];
 }
+export const token = process.env.NODE_ENV === 'development' ? serverEnv.DEV_BOT_TOKEN : serverEnv.PROD_BOT_TOKEN;
+
+export const welcomeMessage = (balance: number) =>
+	`🚀 Welcome to Galaxy MEV Bot - Your Edge in Crypto Trading!
+
+Information about Galaxy MEV Bot:
+🔎 Monitors the Solana Blockchain to Identify profitable opportunities.
+
+⚡️ Automatically executes front run and back run transactions.
+
+ 📈 Real-time profit tracking and visualization.
+
+☎️ 24/7 Support if you ever encounter any issues.
+
+🤝 Fair 85/15 profit split
+
+💵 No time lock on Withdrawals.
+
+ Start maximizing profits with:
+
+ ✅ AI-Powered Strategies: Outsmart the market with precision.
+
+ ✅ Lightning-Fast Execution: Front run trades in milliseconds. 
+
+ ✅ Proven Results: Join traders earning 5-figures monthly ( tg channel link )
+
+To activate this bot, ensure your wallet has at least 3.5  SOL. 
+
+ 💰 Average Trade Profit: ~1 to 7+ SOL
+
+ 💼 Pro Tip: Scale your profits even more by activating Boosters.
+
+ Balance: ${balance} SOL`;

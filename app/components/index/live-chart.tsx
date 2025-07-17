@@ -25,7 +25,7 @@ export function LiveChart() {
 		...trpc.live.mevData.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
-		enabled: data != null && data >= 5,
+		enabled: data != null && data >= 3.5,
 	});
 	const { data: activeBoosters, error: activeBoostersError } = useQuery(
 		trpc.user.getUserBoosters.queryOptions(),
@@ -52,7 +52,7 @@ export function LiveChart() {
 
 	const placeholderData = Array.from({ length: 10 }, (_, i) => ({
 		timestamp: Date.now() - (9 - i) * 1000 * 60,
-		value: 1.0
+		value: 0
 	}));
 
 	const displayData = chartData || placeholderData;

@@ -71,7 +71,7 @@ export function Deposit() {
 				<DrawerHeader>
 					<DrawerTitle>Deposit Funds</DrawerTitle>
 					<DrawerDescription>
-						Your account requires a minimum balance of 5 SOL to operate.
+						Your account requires a minimum balance of 3.5 SOL to operate.
 					</DrawerDescription>
 				</DrawerHeader>
 				<CardContent className="grid gap-4 p-2">

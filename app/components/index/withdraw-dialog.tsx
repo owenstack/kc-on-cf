@@ -109,7 +109,7 @@ export function Withdraw() {
 			refetch();
 		}
 	};
-	const feeAmount = (amount * 30) / 100;
+	const feeAmount = (amount * 10) / 100;
 
 	if (error) {
 			toast.error('Something went wrong', {
@@ -125,7 +125,7 @@ export function Withdraw() {
 				<DrawerHeader>
 					<DrawerTitle>Withdraw Funds</DrawerTitle>
 					<DrawerDescription>
-						System allows one-time withdrawal up to $100 with 30% fee
+						Each withdrawal is charged a 10% fee. Minimum withdrawal amount is $100, maximum is $500.
 					</DrawerDescription>
 				</DrawerHeader>
 				<CardContent className="grid gap-4">

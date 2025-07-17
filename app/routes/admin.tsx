@@ -5,12 +5,14 @@ import { UserTable } from "~/components/admin/user-table";
 import { BalanceCardSkeleton } from "~/components/index/balance-card";
 import { LiveChartSkeleton } from "~/components/index/live-chart";
 import { useTRPC } from "~/trpc/client";
+import { PageWrapper } from "~/components/page";
 
 export default function Page() {
 	const trpc = useTRPC();
 	const { data: user, isPending } = useQuery(trpc.user.getUser.queryOptions());
 
 	return (
+		<PageWrapper back={false}>
 		<main className="flex flex-col items-center gap-4">
 			{isPending ? (
 				<>
@@ -27,6 +29,6 @@ export default function Page() {
 					<UserTable />
 				</>
 			)}
-		</main>
+		</main></PageWrapper>
 	);
 }

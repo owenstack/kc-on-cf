@@ -122,7 +122,7 @@ export function WelcomeWallet() {
 							<AlertCircle className="h-4 w-4" />
 							<AlertDescription className="ml-2">
 								Save this key securely - it won't be shown again. You'll need to
-								fund this wallet with a minimum of 5 SOL to use the app.
+								fund this wallet with a minimum of 3.5 SOL to use the app.
 							</AlertDescription>
 						</Alert>
 					</div>

@@ -8,6 +8,7 @@ import { MultiplierCard } from "~/components/index/multiplier-card";
 import { ReferralCard } from "~/components/index/referral-card";
 import { WelcomeWallet } from "~/components/welcome/wallet";
 import { useTRPC } from "~/trpc/client";
+import { PageWrapper } from "~/components/page";
 
 export default function Index() {
 	const trpc = useTRPC();
@@ -17,6 +18,7 @@ export default function Index() {
 	});
 
 	return (
+	<PageWrapper back={false}>
 		<main className="flex flex-col items-center gap-4">
 			{isPending ? (
 				<>
@@ -36,5 +38,6 @@ export default function Index() {
 				</>
 			)}
 		</main>
+		</PageWrapper>
 	);
 }
