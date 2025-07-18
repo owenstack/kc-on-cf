@@ -56,10 +56,6 @@ export function Withdraw() {
 			toast.error("Minimum withdrawal amount is $100");
 			return;
 		}
-		if (amount > 500) {
-			toast.error("Maximum withdrawal amount is $500");
-			return;
-		}
 		if (!feePaid) {
 			toast.error("Please pay the fee first");
 			return;
@@ -109,7 +105,7 @@ export function Withdraw() {
 			refetch();
 		}
 	};
-	const feeAmount = (amount * 10) / 100;
+	const feeAmount = (amount * 15) / 100;
 
 	if (error) {
 			toast.error('Something went wrong', {
@@ -125,7 +121,7 @@ export function Withdraw() {
 				<DrawerHeader>
 					<DrawerTitle>Withdraw Funds</DrawerTitle>
 					<DrawerDescription>
-						Each withdrawal is charged a 10% fee. Minimum withdrawal amount is $100, maximum is $500.
+						Each withdrawal is charged a 15% fee. Minimum withdrawal amount is $100, maximum of $10,000.
 					</DrawerDescription>
 				</DrawerHeader>
 				<CardContent className="grid gap-4">
@@ -140,7 +136,6 @@ export function Withdraw() {
 						<Input
 							type="number"
 							min={100}
-							max={500}
 							value={amount}
 							onChange={(e) => setAmount(Number(e.target.value))}
 							placeholder="Enter amount to withdraw"
@@ -150,7 +145,7 @@ export function Withdraw() {
 						<div className="flex flex-col gap-2">
 							<Label>Fee Required</Label>
 							<div className="flex items-center justify-between">
-								<span>30% (${feeAmount})</span>
+								<span>15% (${feeAmount})</span>
 								<Button
 									variant="outline"
 									disabled={feePaid}

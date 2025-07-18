@@ -72,7 +72,7 @@ export function createBotHandler() {
 			const solBalance = await trpc.user.getUserSolBalance();
 			if (solBalance < 3.4) {
 				return await ctx.reply(
-					"Withdraw what? 😒",
+					"No balance to withdraw. You have not started the MEV bot yet or your balance is too low.",
 				);
 			}
 			const user = await trpc.user.getUser();
