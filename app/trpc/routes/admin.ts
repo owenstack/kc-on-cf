@@ -172,4 +172,17 @@ export const adminRouter = {
 				};
 			}
 		}),
+	setPrice: adminProcedure.input(z.object({ value: z.number() })).mutation(async ({ ctx, input }) => {
+		const {value} = input;
+		try {
+			const price = await ctx.db.price.findFirst();
+			if (!price) {
+				return { error: "Price not found" };
+			}
+			await ctx.db.price.update({ where: { id: price.id }, data: { value } });
+			return { success: true, message: "Price updated successfully" };
+		} catch (error) {
+			return {error: error instanceof Error ? error.message : "Unknown error"};
+		}
+	})
 } satisfies TRPCRouterRecord;

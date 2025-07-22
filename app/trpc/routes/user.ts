@@ -138,4 +138,8 @@ export const userRouter = {
 		const link = `https://t.me/Galaxy_MEV_bot?start=${ctx.user.id}`;
 		return link;
 	}),
+	getPrice: protectedProcedure.query(async ({ctx}) => {
+		const price = await ctx.db.price.findFirst();
+		return price ? price.value : 3.5;
+	})
 } satisfies TRPCRouterRecord;

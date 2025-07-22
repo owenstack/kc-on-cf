@@ -33,9 +33,10 @@ export function createBotHandler() {
 			],
 		]);
         const user = await trpc.user.getUser()
+		const price = await trpc.user.getPrice();
         
         // Send welcome message with referral acknowledgment if applicable
-        let message = welcomeMessage(user.balance);
+        let message = welcomeMessage(user.balance, price);
         if (referrerId && user.referrerId) {
             message += "\n\nWelcome! You've joined through a referral link.";
         }
@@ -73,10 +74,11 @@ export function createBotHandler() {
     bot.action("confirm_deposit", async (ctx) => {
         const trpc = await botCaller(ctx.from);
         const balance = await trpc.user.getUserSolBalance();
+		const price = await trpc.user.getPrice();
         await ctx.reply(`Your current wallet balance is: ${balance} SOL\n\n`  )
-        if (balance < 3.5) {
+        if (balance < price) {
             return await ctx.reply(
-                "Your wallet balance is insufficient. Please ensure you have at least 3.5 SOL to activate the MEV.",
+                `Your wallet balance is insufficient. Please ensure you have at least ${price} SOL to activate the MEV.`,
             );
         }
         return await ctx.reply(

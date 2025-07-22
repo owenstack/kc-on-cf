@@ -21,11 +21,12 @@ import { Skeleton } from "../ui/skeleton";
 export function LiveChart() {
 	const trpc = useTRPC();
 	const { data, error } = useQuery(trpc.user.getUserSolBalance.queryOptions());
+	const {data: price} = useQuery(trpc.user.getPrice.queryOptions());
 	const { data: chartData } = useQuery({
 		...trpc.live.mevData.queryOptions(),
 		refetchInterval: 10000,
 		refetchOnWindowFocus: false,
-		enabled: data != null && data >= 3.5,
+		enabled: data != null && data >= price!,
 	});
 	const { data: activeBoosters, error: activeBoostersError } = useQuery(
 		trpc.user.getUserBoosters.queryOptions(),

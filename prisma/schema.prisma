@@ -88,3 +88,10 @@ model UserBooster {
 
   @@map("user_booster")
 }
+
+model Price {
+  id    String @id @default(cuid())
+  value Float  @default(3.5)
+
+  @@map("price")
+}

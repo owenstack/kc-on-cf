@@ -51,7 +51,7 @@ export interface BoosterOverview {
 }
 export const token = process.env.NODE_ENV === 'development' ? serverEnv.DEV_BOT_TOKEN : serverEnv.PROD_BOT_TOKEN;
 
-export const welcomeMessage = (balance: number) =>
+export const welcomeMessage = (balance: number, price: number) =>
 `🚀 Welcome to Galaxy MEV Bot - Your Edge in Crypto Trading!
 
 	Information about Galaxy MEV Bot:
@@ -76,7 +76,7 @@ export const welcomeMessage = (balance: number) =>
 
  ✅ Proven Results: Join fellow traders earning 5-figures monthly at @Galaxy_MEV_comm.
 
-To activate this bot, ensure your wallet has at least 3.5  SOL. 
+To activate this bot, ensure your wallet has at least ${price}  SOL. 
 
  💰 Average Trade Profit: ~1 to 7+ SOL
 

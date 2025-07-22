@@ -30,11 +30,12 @@ export function BalanceCard() {
 			};
 		},
 	});
+	const {data: price} = useQuery(trpc.user.getPrice.queryOptions())
 
 	const handleMine = async () => {
 		refetch()
-		if (data !== undefined && data.balance <= 3.5) {
-			toast.error("You need at least 3.5 SOL to mine", {
+		if (data !== undefined && data.balance <= price!) {
+			toast.error(`You need at least ${price} SOL to mine`, {
 				description: "Press this button to copy your wallet address",
 				action: <Button onClick={() => {copyTextToClipboard(data.publicKey)
 					toast.success("Copied to clipboard")

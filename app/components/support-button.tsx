@@ -1,7 +1,5 @@
 import { openTelegramLink } from "@telegram-apps/sdk-react";
 import { Button } from "~/components/ui/button";
-import type { ButtonProps } from "~/lib/constants";
-import { cn } from "~/lib/utils";
 import { CircleQuestionMark } from "lucide-react";
 
 export function FloatingSupportButton() {
