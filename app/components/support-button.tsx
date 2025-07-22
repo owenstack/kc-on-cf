@@ -13,7 +13,7 @@ export function FloatingSupportButton() {
                 className="rounded-full shadow-lg hover:shadow-xl transition-all duration-200 bg-background/80 backdrop-blur-sm border-2"
                 onClick={() =>
                     openTelegramLink(
-                        "https://t.me/@GalaxyMEVSupport",
+                        "https://t.me/GalaxyMEVSupport",
                     )
                 }
             >
