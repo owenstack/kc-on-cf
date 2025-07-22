@@ -40,7 +40,7 @@ export function createBotHandler() {
             message += "\n\nWelcome! You've joined through a referral link.";
         }
         
-		return ctx.reply(message, { ...keyboard, parse_mode: 'MarkdownV2' });
+		return ctx.reply(message, keyboard);
 	});
 
     bot.action("deposit", async (ctx) => {
