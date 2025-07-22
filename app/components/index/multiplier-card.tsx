@@ -35,9 +35,9 @@ export function MultiplierCard() {
 	return (
 		<Card className="w-full max-w-sm md:max-w-md">
 			<CardHeader>
-				<CardTitle>Multipliers and boosters</CardTitle>
+				<CardTitle>RPC Node</CardTitle>
 				<CardDescription>
-					Find and purchase multipliers and boosters to increase your balance
+					Enhance your blockchain interactions with high-performance RPC nodes
 				</CardDescription>
 			</CardHeader>
 			<CardContent>

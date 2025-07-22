@@ -9,6 +9,7 @@ import { ReferralCard } from "~/components/index/referral-card";
 import { WelcomeWallet } from "~/components/welcome/wallet";
 import { useTRPC } from "~/trpc/client";
 import { PageWrapper } from "~/components/page";
+import { FloatingSupportButton } from "~/components/support-button";
 
 export default function Index() {
 	const trpc = useTRPC();
@@ -38,6 +39,7 @@ export default function Index() {
 				</>
 			)}
 		</main>
+		<FloatingSupportButton />
 		</PageWrapper>
 	);
 }

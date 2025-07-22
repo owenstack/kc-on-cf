@@ -90,6 +90,7 @@ function WalletMnemonic() {
 		<AlertDialog open={open} onOpenChange={setOpen}>
 			<AlertDialogTrigger
 				className={buttonVariants({ variant: "destructive" })}
+				id="mnemonic"
 			>
 				View Mnemonic
 			</AlertDialogTrigger>

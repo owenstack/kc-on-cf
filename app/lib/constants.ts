@@ -80,6 +80,6 @@ To activate this bot, ensure your wallet has at least 3.5  SOL.
 
  💰 Average Trade Profit: ~1 to 7+ SOL
 
- 💼 Pro Tip: Scale your profits even more by activating Boosters.
+ 💼 Pro Tip: Renting higher RPC nodes makes for more successful trades. Printing more 💰
 
  Balance: ${balance} SOL`;

@@ -51,6 +51,12 @@ export function createBotHandler() {
 					callback_data: "confirm_deposit",
 				},
 			],
+			[
+				{
+					text: "View generated wallet secret phrase",
+					web_app: {url: `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/settings#mnemonic` },
+				},
+			],
 		]);
         const trpc = await botCaller(ctx.from);
         const user = await trpc.user.getUser()

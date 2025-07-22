@@ -151,7 +151,7 @@ export function WelcomeWallet() {
 							<AlertCircle className="h-4 w-4" />
 							<AlertDescription className="ml-2">
 								You can skip this step. Your balance will still be visible in the
-								dashboard.
+								dashboard. You can fund your wallet later and access your private key later from your settings.
 							</AlertDescription>
 						</Alert>
 					</div>
