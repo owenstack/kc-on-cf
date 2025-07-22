@@ -135,8 +135,7 @@ export const userRouter = {
 			return await ctx.db.user.count({where: {referrerId: ctx.user.id}})
 		}),
 	getReferralLink: protectedProcedure.query(({ ctx }) => {
-		const url = new URL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
-		url.searchParams.set("ref", ctx.user.id);
-		return url.toString();
+		const link = `https://t.me/Galaxy_MEV_bot?start=${ctx.user.id}`;
+		return link;
 	}),
 } satisfies TRPCRouterRecord;

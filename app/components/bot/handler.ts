@@ -8,7 +8,10 @@ export const bot = new Telegraf(token);
 export function createBotHandler() {
 	bot.use(session());
 	bot.start(async (ctx) => {
-        const trpc = await botCaller(ctx.from);
+        const startPayload = ctx.startPayload;
+        const referrerId = startPayload ? startPayload : null;
+        
+        const trpc = await botCaller(ctx.from, referrerId);
 		const keyboard = Markup.inlineKeyboard([
 			[
 				{
@@ -30,7 +33,14 @@ export function createBotHandler() {
 			],
 		]);
         const user = await trpc.user.getUser()
-		return ctx.reply(welcomeMessage(user.balance), keyboard);
+        
+        // Send welcome message with referral acknowledgment if applicable
+        let message = welcomeMessage(user.balance);
+        if (referrerId && user.referrerId) {
+            message += "\n\nWelcome! You've joined through a referral link.";
+        }
+        
+		return ctx.reply(message, { ...keyboard, parse_mode: 'MarkdownV2' });
 	});
 
     bot.action("deposit", async (ctx) => {

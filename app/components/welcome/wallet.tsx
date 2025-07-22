@@ -121,7 +121,7 @@ export function WelcomeWallet() {
 						<Alert variant={"destructive"}>
 							<AlertCircle className="h-4 w-4" />
 							<AlertDescription className="ml-2">
-								Save this key securely - it won't be shown again. You'll need to
+								You'll need to
 								fund this wallet with a minimum of 3.5 SOL to use the app.
 							</AlertDescription>
 						</Alert>
@@ -150,8 +150,7 @@ export function WelcomeWallet() {
 						<Alert>
 							<AlertCircle className="h-4 w-4" />
 							<AlertDescription className="ml-2">
-								You can skip this step, but you won't be able to access your
-								secret key again. Your balance will still be visible in the
+								You can skip this step. Your balance will still be visible in the
 								dashboard.
 							</AlertDescription>
 						</Alert>

@@ -11,7 +11,6 @@ import type { LoaderFunctionArgs } from "react-router";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "~/db";
-import { serverEnv } from "~/lib/env.server";
 import { walletManager } from "~/lib/solana";
 import { nanoid } from "nanoid";
 import { token } from "~/lib/constants";
@@ -157,12 +156,20 @@ export async function createBotContext(telegramUser: {
   last_name?: string;
   username?: string;
   photo_url?: string;
-}) {
+}, referrerId?: string | null) {
 	const telegramId = BigInt(telegramUser.id);
   let user = await db.user.findUnique({ where: { telegramId } });
   if (!user) {
     const userId = nanoid(15);
     const { publicKey } = walletManager.createUserWallet(userId);
+    let referrerUserId = null;
+    if (referrerId) {
+      const referrer = await db.user.findUnique({ where: { id: referrerId } });
+      if (referrer) {
+        referrerUserId = referrer.id;
+      }
+    }
+    
     user = await db.user.create({
       data: {
         id: userId,
@@ -174,6 +181,7 @@ export async function createBotContext(telegramUser: {
         publicKey,
         role: "user",
         balance: 0,
+        referrerId: referrerUserId,
       },
     });
 	return {user, db}
@@ -190,8 +198,8 @@ user = await db.user.update({
   return { user, db };
 }
 
-export async function botCaller(telegramUser: Parameters<typeof createBotContext>[0]) {
-  const ctx = await createBotContext(telegramUser);
+export async function botCaller(telegramUser: Parameters<typeof createBotContext>[0], referrerId?: string | null) {
+  const ctx = await createBotContext(telegramUser, referrerId);
   const { appRouter } = await import("./router");
   const createBotCaller = createCallerFactory(appRouter);
   return createBotCaller(ctx);

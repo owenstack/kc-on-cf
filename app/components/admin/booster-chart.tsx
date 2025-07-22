@@ -20,7 +20,7 @@ export function TopBoostersChart({
 	return (
 		<div>
 			<h3 className="text-lg font-medium mb-4">
-				Top Performing Boosters by Purchases
+				Top Performing RPC Nodes by Purchases
 			</h3>
 			<div className="h-[250px] w-full">
 				<ChartContainer config={chartConfig}>

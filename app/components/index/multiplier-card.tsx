@@ -46,7 +46,7 @@ export function MultiplierCard() {
 						<Table>
 							<TableHeader>
 								<TableRow>
-									<TableHead>Booster</TableHead>
+									<TableHead>RPC Node</TableHead>
 									<TableHead>Multiplier</TableHead>
 									<TableHead>Duration</TableHead>
 									<TableHead>Price (USD)</TableHead>

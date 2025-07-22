@@ -21,7 +21,7 @@ export function AdminBooster() {
 			<Card className="flex flex-col items-center justify-center p-8 w-full max-w-sm">
 				<AlertTriangle className="h-12 w-12 text-destructive" />
 				<p className="mt-4 text-lg font-semibold">
-					Failed to load booster data.
+					Failed to load RPC node data.
 				</p>
 				<p className="text-sm text-muted-foreground">{error?.message}</p>
 			</Card>

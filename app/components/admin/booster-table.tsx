@@ -16,7 +16,7 @@ export function AllBoostersTable({
 }) {
 	return (
 		<div>
-			<h3 className="text-lg font-medium mb-4">All Boosters</h3>
+			<h3 className="text-lg font-medium mb-4">All RPC Nodes</h3>
 			{/* This div makes the table scrollable */}
 			<div className="relative h-[400px] overflow-auto rounded-md border">
 				<Table>
