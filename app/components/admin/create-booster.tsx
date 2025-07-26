@@ -118,6 +118,7 @@ export function CreateBoosterDialog() {
 										onClick={() => {
 											setType("oneTime");
 											form.setValue("type", "oneTime");
+											form.setValue('duration', 1000 * 60)
 										}}
 									/>
 									<Label>One time</Label>
@@ -138,6 +139,7 @@ export function CreateBoosterDialog() {
 										onClick={() => {
 											setType("permanent");
 											form.setValue("type", "permanent");
+											form.setValue('duration', Number.POSITIVE_INFINITY);
 										}}
 									/>
 									<Label>Permanent</Label>
