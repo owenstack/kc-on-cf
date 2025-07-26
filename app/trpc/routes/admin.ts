@@ -172,6 +172,23 @@ export const adminRouter = {
 				};
 			}
 		}),
+	deleteBooster: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+		console.log("Entering deleteBooster procedure with input:", input);
+		try {
+			const booster = await ctx.db.booster.findUnique({ where: { id: input.id } });
+			if (!booster) {
+				console.error("Booster not found in deleteBooster procedure");
+				return { error: "Booster not found" };
+			}
+			await ctx.db.booster.delete({ where: { id: input.id } });
+			return { success: true, message: "Booster deleted successfully" };
+		} catch (error) {
+			console.error("Error in deleteBooster procedure:", error);
+			return {
+				error: error instanceof Error ? error.message : "Unknown error",
+			};
+		}
+	}),
 	setPrice: adminProcedure.input(z.object({ value: z.number() })).mutation(async ({ ctx, input }) => {
 		const {value} = input;
 		try {
