@@ -105,6 +105,7 @@ export function CreateBoosterDialog() {
 									placeholder="Booster price"
 									type="number"
 									required
+									onChange={(e) => field.onChange(Number(e.target.value))}
 								/>
 							)}
 						/>
@@ -153,6 +154,7 @@ export function CreateBoosterDialog() {
 										placeholder="Booster duration"
 										type="number"
 										required
+										onChange={(e) => field.onChange(Number(e.target.value))}
 									/>
 								)}
 							/>
@@ -161,7 +163,12 @@ export function CreateBoosterDialog() {
 							name="multiplier"
 							label="Booster multiplier"
 							render={({ field }) => (
-								<Input {...field} placeholder="Booster multiplier" required />
+								<Input
+									{...field}
+									placeholder="Booster multiplier"
+									required
+									onChange={(e) => field.onChange(Number(e.target.value))}
+								/>
 							)}
 						/>
 						<Button type="submit" disabled={isPending}>
