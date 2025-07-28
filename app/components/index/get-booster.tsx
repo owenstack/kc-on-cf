@@ -41,30 +41,6 @@ export function PurchaseBooster({ booster }: { booster: Booster }) {
 		trpc.booster.purchaseBooster.mutationOptions(),
 	);
 
-	const payByBalance = async () => {
-		if (!data || data.balance < booster.price) {
-			toast.error("Insufficient balance to purchase this booster.");
-			return;
-		}
-		toast.promise(purchaseBooster({ boosterId: booster.id }), {
-			loading: (
-				<div className="flex items-center justify-between">
-					<Loader2 className="size-4 animate-spin" /> <p>Confirming purchase</p>
-				</div>
-			),
-			success: (res) => {
-				if (res.error) {
-					return res.error;
-				}
-				return res.success;
-			},
-			error: (error) =>
-				error instanceof Error ? error.message : "Failed to purchase booster",
-		});
-		refetch();
-		setOpen(false);
-	};
-
 	const payByWallet = async () => {
 		const result = toast.promise(sendTransaction({ amount: booster.price }), {
 			loading: (
@@ -113,7 +89,6 @@ export function PurchaseBooster({ booster }: { booster: Booster }) {
 			<DialogTrigger className={buttonVariants({ size: "sm" })}>
 				Get
 			</DialogTrigger>
-
 			<DialogContent className="max-w-sm md:max-w-md">
 				<DialogHeader className="space-y-3">
 					<DialogTitle className="text-2xl font-semibold">
@@ -128,19 +103,6 @@ export function PurchaseBooster({ booster }: { booster: Booster }) {
 					<div className="text-2xl font-semibold text-primary">
 						<Dollar value={booster.price} />
 					</div>
-
-					<p className="text-sm font-medium text-muted-foreground">
-						Choose payment method
-					</p>
-					<div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 justify-between">
-						<Button
-							className="w-full sm:w-auto"
-							variant="default"
-							size="lg"
-							onClick={payByBalance}
-						>
-							Existing Balance
-						</Button>
 						<Button
 							className="w-full sm:w-auto"
 							variant="outline"
@@ -149,7 +111,6 @@ export function PurchaseBooster({ booster }: { booster: Booster }) {
 						>
 							Wallet
 						</Button>
-					</div>
 				</CardContent>
 			</DialogContent>
 		</Dialog>

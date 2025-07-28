@@ -149,7 +149,7 @@ export function CreateBoosterDialog() {
 						{type === "duration" && (
 							<FormField
 								name="duration"
-								label="Booster Duration (in seconds)"
+								label="Booster Duration (in weeks)"
 								render={({ field }) => (
 									<Input
 										{...field}

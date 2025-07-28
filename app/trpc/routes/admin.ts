@@ -163,7 +163,7 @@ export const adminRouter = {
 		.mutation(async ({ ctx, input }) => {
 			console.log("Entering createBooster procedure with input:", input);
 			try {
-				await ctx.db.booster.create({ data: input });
+				await ctx.db.booster.create({ data: {...input, duration: input.duration * 1000 * 60 * 60 * 24 * 7 } });
 				return { success: true, message: "Booster created successfully" };
 			} catch (error) {
 				console.error("Error in createBooster procedure:", error);
